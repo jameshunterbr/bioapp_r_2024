@@ -1,0 +1,28 @@
+---
+title: "Guia de Estilo para Escrever R"
+author: "James R. Hunter, Ph.D."
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Estilo conta!
+
+Quando escrevemos codigo em R, o estilo que usamos pode facilitar o entendimento do R e seus pacotes para executar suas instruções corretamente. Também e talvez mais importante, o estilo que você escreve R vai facilitar o entendimento do leitor do código, até seu entendimento quando você voltar para olhar no seu script algumas semanas depois que você escreveu ele.
+
+Existe algumas guias de estilo que representa a sabedoria comum da comunidade dos programadores de R no mundo. As guias começaram com um esforço de Google para orientar seus programadores trabalhando em R. Hadley Wickham e a equipe de Tidyverse de Posit usou isso como modelo para criar sua guia. Depois, Google adaptou a guia de Wickham em uma nova versão.
+
+Porque eu concordo com as dicas e regras de Wickham/Tidyverse mais que alguns elementos do estilo de Google, vamos usar este guia no curso.[^1]
+
+[^1]: Wickham recomenda o uso de "snake_case" nos nomes dos arquivos, mas Google gosta de "UpperCamelCase" como estilo. Acho "CamelCase" díficil a ler e sujeito aos erros quando você está tentando escrevê-lo na programação. Então, minha preferencia para "snake_case". Nas aulas, vou apresentar esses conceitos e estilos.
+
+Também, a guia de Tidyverse tem dois pacotes de R que suportam as regras desse estilo. O pacote "`styler`" examina o código de um arquivo (script), avalia a conformidade com as regras dos estilo da guia de Tidyverse e corrige os erros do estilo. O segundo pacote, "`lintr`", não só examina o arquivo para erros do estilo, mas também de programação e dá para programador um relatório com uma lista de todos os erros que acha. `lintr` é muito mais intensivo que `styler,` mas não corrige os erros. Programadores muito experientes gostam de `lintr`, mas é pesado demais para iniciantes. Eu prefiro `styler`.
+
+# Guia de Tidyverse
+
+A guia fica no url seguinte: <https://style.tidyverse.org>
+
+Fica na forma de um livro de bookdown. `bookdown` é um pacote de Tidyverse que deixa você cria um documento na forma de um livro com capitulos, etc.
