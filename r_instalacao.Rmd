@@ -1,0 +1,123 @@
+---
+title: "Bioinformática Aplicada – 2024"
+subtitle: "Instalação dos Softwares"
+author: "James R. Hunter, D.Sc."
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "11 de Outubro 2024"
+output:
+  xaringan::moon_reader:
+    css: 
+      - default
+      - css/nhsr.css
+      - css/nhsr-fonts.css
+    lib_dir: libs
+    seal: false
+    nature:
+      highlightStyle: googlecode
+      highlightLines: true
+      highlightLanguage: ["r"]
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      after_body: [css/insert-logo.html]
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+library(tidyverse)
+# library(NHSRtheme)
+library(here)
+library(glue)
+library(summarytools)
+library(janitor)
+library(here)
+
+# set default options
+opts_chunk$set(echo = FALSE,
+               fig.width = 7.252,
+               fig.height = 4,
+               dpi = 300)
+
+```
+
+class: title-slide, left, bottom
+
+# `r rmarkdown::metadata$title`
+----
+## **`r rmarkdown::metadata$subtitle`**
+### `r rmarkdown::metadata$author`
+### `r rmarkdown::metadata$date`
+
+---
+class: center, middle, inverse
+
+# Instalação dos Softwares
+
+---
+
+# Instalar R
+
+-   Fica na página seguinte:
+    -   https://cran.r-project.org/
+    
+```{r Rinicial, echo = FALSE, fig.align = "center", out.width = "80%"}
+
+knitr::include_graphics((here("images", 'CRAN_main_screen.png')))
+```
+
+---
+
+# Na Tela Inicial (Windows)
+
+1.  Clique no link "Download R for Windows"
+
+2.  Na próxima tela, clique no "`base`"
+    -   *Mac náo faz este passo*
+
+```{r Rwin1, echo = FALSE, fig.align='center', out.width = "70%"}
+knitr::include_graphics(here("images", 'cran_download_windows.png'))
+```
+
+---
+
+# Proceder para Instalação
+
+-   Clicar on **Download R 4.4.1 for Windows**
+
+```{r Rwin2, echo = FALSE, fig.align='center', out.width = "70%"}
+knitr::include_graphics(here("images", 'download_431_windows.png'))
+```
+
+-   Programa vai aparecer no seu computador
+
+---
+# Instalação de RStudio
+
+-   Site: https://posit.co/download/rstudio-desktop/
+
+-   Role para baixo até um grande botão *azul*: "Download RStudio"
+    -   Vai informar o número de versão e tamanho do programa
+
+
+```{r Rstud_install, echo = FALSE, fig.align='center', out.width = "70%"}
+knitr::include_graphics(here("images", 'RStudio_Download.png'))
+```
+
+---
+
+# Iniciar RStudio
+
+-   Na área de trabalho (ou através dos menus), *duplo click* no ícone de RStudio 
+    -   **Não o ícone de R**
+
+-   RStudio abrirá
+    -   R automaticamente abrirá dentro do RStudio
+
+
+---
+# Console Inicial de RStudio -- Ready to Rock!
+
+```{r Rstud_main, echo = FALSE, fig.align='center', out.width = "60%"}
+knitr::include_graphics(here("images", 'RStudio_start.png'))
+```
+
