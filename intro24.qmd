@@ -35,6 +35,8 @@ execute:
   message: false
 ---
 
+## ![](r_module_logo.png){width="500"}
+
 ## Introdução
 
 Nas seis semanas do modulo, nós vamos aprender a linguagem de computação R. Esta é uma linguagem muito utilizada hoje em dia para análises estatísticas em biologia e medicina. Nos EUA, é a linguagem e ferramenta mais utilizada nas faculdades de ciências.
@@ -61,7 +63,13 @@ Outra vantagem é que R e RStudio são softwares "*open-source*" que são dispon
 
 Dr. Hunter fez o doutorado em Doenças Infecciosas em UNIFESP em 2019. Antes, ele tinha feito um B.A. e um M.C.P. (Mestrado em Urbanismo), ambos da Universidade Yale nos EUA. Desde 1970, ele ensina matérias sobre métodos quantitativos, estatística e pesquisa operacional nos EUA, Inglaterra, Canadá e o Brasil. Atualmente, ele é Professor Afiliado da UNIFESP e um Pós-Doutorando no Laboratório de Retrovirologia da Escola Paulista de Medicina. Ele mora em Brasil desde 1999 e iniciou atividades em UNIFESP em 2014.
 
-## Matérais para Aprender R
+## Contatos para Dr. Hunter
+
+Escritório: EP2, 6º Andar (fundos), Laboratório de Retrovirologia\
+email: jhunter\@unifesp.br\
+Cel e WhatsApp: +55 (11) 95327-5656
+
+## Matériais para Aprender R
 
 Mais importante, nenhum curso vai ensinar tudo sobre um tópico. É assim com este curso. Precisa consultar outras matériais que tratam do assunto também. Esses matérias podem apresentar o assunto que você está estudando com uma visão diferente e mais convincente para você.
 
@@ -109,14 +117,14 @@ Além desses livros, vou indicar uma serie dos site, blogs, YouTubes, antes e de
 
 **Aulas e Salas**
 
-|    Data      |                           Aula                           | 
-|:------------:|:--------------------------------------------------------:|
-| 27 Outubro   | Conceitos Básicos de Programação e de R; Tipos de Dados  | 
-| 05 Novembro  | Fluxo de Controle; Condicionais; Funções; Bibliotecas    | 
-| 12 Novembro  | Visualização dos Dados com Base R e ggplot               | 
-| 19 Novembro  | Testes de Dados em R com 2 ou Mais Variáveis             | 
-| 26 Novembro  | Bioinformática em R; Bioconductor                        | 
-| 02 Dezembro  | Funções e Pacotes                                        | 
+|    Data     |                          Aula                           |
+|:-----------:|:-------------------------------------------------------:|
+| 27 Outubro  | Conceitos Básicos de Programação e de R; Tipos de Dados |
+| 05 Novembro |  Fluxo de Controle; Condicionais; Funções; Bibliotecas  |
+| 12 Novembro |       Visualização dos Dados com Base R e ggplot        |
+| 19 Novembro |      Testes de Dados em R com 2 ou Mais Variáveis       |
+| 26 Novembro |            Bioinformática em R; Bioconductor            |
+| 02 Dezembro |                    Funções e Pacotes                    |
 
 ## Laptops e O Que Precisa Fazer para Preparar para a Primeira Aula
 
