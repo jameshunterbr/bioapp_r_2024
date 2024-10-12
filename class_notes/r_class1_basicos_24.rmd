@@ -1,0 +1,727 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Arquivos e Programação em R"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "27 de outubro de 2024"
+output:
+  xaringan::moon_reader:
+    css: 
+      - default
+      - css/nhsr.css
+      - css/nhsr-fonts.css
+    lib_dir: libs
+    seal: false
+    nature:
+      highlightStyle: googlecode
+      highlightLines: true
+      highlightLanguage: ["r"]
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      after_body: [css/insert-logo.html]
+---
+```{r setup, include = FALSE}
+options(scipen = 5)
+gr <- here::here("images")
+pacman::p_load(tidyverse, here, summarytools, janitor, knitr, NHSRtheme)
+# set default options
+opts_chunk$set(echo = FALSE,
+               fig.width = 7.252,
+               fig.height = 4,
+               dpi = 300)
+
+# uncomment the following lines if you want to use the NHS-R theme colours by default
+scale_fill_continuous <- partial(scale_fill_nhs, discrete = FALSE)
+scale_fill_discrete <- partial(scale_fill_nhs, discrete = TRUE)
+scale_colour_continuous <- partial(scale_colour_nhs, discrete = FALSE)
+scale_colour_discrete <- partial(scale_colour_nhs, discrete = TRUE)
+```
+
+class: middle, center
+```{r}
+include_graphics(here(gr, 'r_module_logo.png'))
+```
+
+---
+
+class: title-slide, left, bottom
+
+# `r rmarkdown::metadata$title`
+----
+## **`r rmarkdown::metadata$subtitle`**
+### `r rmarkdown::metadata$author`
+### `r rmarkdown::metadata$date`
+
+---
+
+
+class: inverse, middle, center
+
+# Tipos/Classes de Dados em R
+
+---
+
+# Tipos de Dados *Atômicos* 
+
+-   `<int>` **integer** 
+    -   Números inteiros (sem parte decimal)
+    -   Designados em R com um "L" (`26L`)
+    
+-   `<dbl>` **double** 
+    -   Números "Real" 
+    -   Tem uma parte decimal (mesmo se for implicita)
+    -   Designados em R como "numeric"
+
+-   `<chr>` **character** 
+    -   "*Strings*"
+    -   Cercados por aspas simples ou duplas (`''` or `""`)
+
+-   `<lgl>` **logical** 
+    -   Só podem assumir os valores `TRUE` ou `FALSE` 
+
+---
+
+# Dados Lógicos
+
+-   Podem ser interpretados como números (*integers*)
+    -   `FALSE` = 0
+    -   `TRUE` = 1
+
+-   Podem ser atribuidos como
+    -   `x <- TRUE`
+
+-   Podem ser o resultado de cálculos *lógicos*
+    -   Dois números são iguais, não iguais, ...
+
+---
+    
+# Cálculos Lógicos
+
+- Operadores lógicos
+  - `==` lado esquerdo igual ao lado direto
+  - `!=` lado esquerdo **não** igual ao lado direto
+  - `>=` lado esquerdo maior ou igual ao lado direto
+  - `<`  lado esquerdo menor do lado direto
+  
+---
+
+# Exemplos
+
+```{r log_calc, echo = TRUE}
+x <- 6 # atribuir um valor a x
+x == 6 # testar se x é igual a 6
+
+2 > 4
+
+```
+
+---
+
+# Quer Saber Qual Tipo de Variável É Ela?
+
+-   `typeof()` - tipo interno do objeto
+-   `class()` - tipo geral do objeto
+    -   Muito útil para tipos compostos (ie, não atômicos)
+
+---
+    
+# Exemplos dos Tipos atômicos
+
+```{r varclass, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+int_var <- 25L
+typeof(int_var) 
+num_var <- 25.879
+typeof(num_var)
+log_var <- TRUE
+typeof(log_var)
+char_var <- "abcd"
+typeof(char_var)
+
+```
+
+---
+
+# Hierarquia das Classes - Coerção
+
+-   R pensa que não pode misturar operações que envolvem operações com classes diferentes
+    -   Não pode multiplicar um string por um número
+    -   R retorna um erro
+
+```{r char_ver, echo = FALSE, fig.align='center', out.width = "90%"}
+include_graphics(here(gr, 'char_ver_times_2.png'))
+```
+
+---
+
+# Hierarquia 
+
+-   De mais restritivo ao mais geral
+    -   **Logical**
+        -   Só tem dois valores
+        -   Também são *integers* (com valores 0 e 1) e podem estar usados para os cálculos
+    
+    -   **Integer**
+        -   Pode ser calculados como se fossem *numeric*
+        -   Armazenados numa forma mais compacta na memoria que than *numeric*
+    
+    -   **Numeric**
+        -   Qualquer número pode ser um valor *numeric*
+    
+    -   **Character**
+        -   Qualquer outra classes pode ser gravada em memoria como *character*
+        -   Não pode fazer cálculos com *character*
+        
+---
+
+# Coerção
+
+-   Aplica-se principalmente aos *vectors*
+
+-   Vetores devem ter valores de um tipo só
+
+-   R forçará os valores a serem o tipo *mais geral* dos tipos que você fornecer
+
+---
+
+# Exemplos da Coerção
+
+```{r vect_type1, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+(vect1 <- c(7L, 27890L))
+typeof(vect1)
+```
+-   2 *integers*, tipo resultado = *integer*
+
+---
+
+# Exemplo 2
+
+```{r vect_type2, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+(vect2 <- c(7L, 27.333))
+typeof(vect2)
+```
+
+-   *Integer* e *numeric* valores, tipo resultado = *double* 
+
+---
+
+# Exemplo 3
+
+```{r vect_type3, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+(vect3 <- c(27.333, "cat"))
+typeof(vect3)
+
+```
+
+-   *Double* and *character* values, tipo resultado = *character*
+
+---
+
+# Exemplo 4
+
+```{r vect_type4, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+(vect4 <- c(TRUE, 7L, 27.333, "cat"))
+typeof(vect4)
+```
+
+-   Combinação de todos os tipos atômicos, tipo resultado = *character*
+
+---
+
+# Exemplo 5 
+
+```{r vect_type5, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+(vect5 <- c(7L, TRUE))
+typeof(vect5)
+```
+
+-   *Integer* e *Logical* valores, tipo resultado = *integer*
+
+-   Somas desses valores - possível
+
+```{r vect_type6, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+sum(vect5)
+```
+
+---
+
+# Coerção com Comandos
+
+-   Pode forçar a coerção de uma variável para um tipo diferente
+    -   Se for um tipo apropriado para o valor
+    
+-   Comandos `as.xxx()` 
+    -   `as.logical()`
+    -   `as.integer()`
+    -   `as.numeric()`
+    -   `as.character()`
+
+---
+
+
+# Exemplos de Coerção
+
+```{r ex_coer, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+as.character(25.3)
+as.integer(25.3) # perdera a parte decimal
+as.numeric("25.3") # vai tornar um numero
+as.numeric("cat") # Nao e permitido; resultado = NA
+
+```
+
+---
+
+class: center, middle, inverse
+
+# Mais Classes de Dados
+
+---
+
+# *Factors*
+
+-   Maneira compacta para gravar informações categóricas
+
+-   Transforma *strings*, números e valores lógicos em um fatorConverts strings, numbers and even logical variables into factor
+
+-   Duas partes para um *factor*
+    -   Lista interna das possibilidades alternativas (*levels*)
+    -   *Integers* que atribuem cada valor para um *level*
+    
+-   Úteis quando tem um número limitado de possibilidades
+    -   Gênero, tipo de tratamento, etc.
+    -   Menos de 10 níveis (*levels*) em geral 
+    
+---
+
+# Exemplo *Factor* - 1
+ 
+-   Variável para *gênero* em um estudo
+
+-   4 níveis possíveis: 
+    -   "masculino", "feminino", "não quer declarar", "outro"
+
+-   `gênero` atualmente uma variável *character*    
+
+```{r fact_surv, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+genero <- c("feminino", "não quer declarar", "outro", "masculino", "feminino",
+            "masculino")
+genero
+typeof(genero)
+```
+
+---
+
+# Exemplo *Factor* - 2
+
+-   Converter `genero` para um *factor* com `factor()`
+
+```{r chartofact, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+generof <- factor(genero)
+
+typeof(generof)
+class(generof)
+
+
+```
+
+---
+
+# Exemplo *Factor* - 3
+
+```{r chartofact2, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+str(generof)
+levels(generof)
+```
+
+---
+
+# Representação das Datas e Horas
+
+-   Várias classes tratam de datas e horas
+
+-   Vamos focar nas classe *Date*
+
+-   Pacotes que facilitar trabalho com datas e horas
+    -   `lubridate`
+    -   `hms`
+
+
+-   Em *databases*, datas normalmente têm representação como *strings* ("04-09-2021")
+
+---
+
+## Converter *String* de Data para Classe de Data
+
+-   Função `as.Date()` 
+
+-   Se data não está no formato de data ISO ("YYYY-mm-dd")
+    -   Precisa avisar `as.Date()` qual formato que tem
+        -   "%d" = dia
+        -   "%m" = mês
+        -   "%y" ou "%Y" = ano (2 digitos or 4)
+        -   O *string* inteiro em aspas ("")
+        
+---
+
+# Exemplo Converter Data
+
+```{r date_conv, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+d <- "28/05/2021"
+d_date <- as.Date(d, format = "%d/%m/%Y")
+d_date
+class(d_date)
+```
+
+---
+
+# Matemática com Datas
+
+-   Pode calcular intervalos de tempo utilizando o tipo de dado **Date**
+
+-   Operações aritméticas normais 
+
+-   VSS: função `Sys.Date()` retorna a data atual
+
+-   Aritmética de datas útil para calcular idade, tempo desde infecção
+
+```{r calc_date, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+hoje <- Sys.Date() 
+hoje
+hoje - d_date 
+```
+
+---
+
+class: center, middle, inverse
+
+# Trabalho com Vetores
+
+---
+
+# Indexação dos Vetores
+
+-   Acessar qualquer elemento de um vetor com um número cercado por "[]" (colchetes)
+
+-   Vetor `x` tem 10 números reais
+    -   Primero número: `x[1]`
+    -   Sexto número: `x[6]`
+    
+```{r ind, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+x <- c(177.89, 194.47, 32.24, 99.56, 205.34, 
+       -0.95, 171.96, 112.65, 32.93, 60.53)
+
+# 1o numero
+x[1]
+
+# 6o numero
+x[6]
+```
+
+---
+
+# E Tem Mais ...
+
+-   Acessar o 2º e 5º elementos de `x`
+    -   Utilize a função `c()`
+
+-   Acessar o 2º **ate** o 6º elementos
+    -   Utiliza o operador `:`
+    
+```{r ind2, echo = TRUE}
+x[c(2,5)]
+x[2:5]
+
+```
+
+---
+
+# `head()` & `tail()`
+
+-   Acessar os primeiros *n* valores do vetor com `head()`
+    -   n como argumento dentro das parênteses (default = 6)
+
+-   Acessar os últimos *n* valores do vetor com `tail()`
+
+
+```{r ind4, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+head(x)
+tail(x)
+head(x, n = 3)
+```
+
+---
+
+class: center, middle, inverse
+
+# Classes de Conjuntos de Dados
+
+---
+
+# Conjuntos de Dados em R
+
+-   Coleção de variáveis
+    -   Cada uma tem vários casos
+    
+-   Variável
+    -   Identificador
+    -   Classificador categórico
+    -   Valor númerico ou lógico
+    
+-   Variável é um vetor
+    -   Todos os valores devem ser do mesmo tipo
+    -   Todas as variáveis num conjunto (exceto *list*) devem ter o mesmo número de casos
+
+-   3 classes de conjuntos de dados
+    -   `List`
+    -   `Data.frame`
+    -   `Tibble`
+    
+---
+
+# List
+
+-   Tipo mais geral
+
+-   Qualquer tipo de dado
+
+-   R não aplica coerção
+
+-   Em análises de dados cotidianas, não é muito comum
+
+-   Mas, `data.frame` e `tibble` são subtipos de `list`
+
+
+```{r li, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+vect4 <- list(TRUE, 7L, 27.333, "cat")
+typeof(vect4)
+typeof(vect4[[2]])
+```
+
+---
+
+# Data.frame
+
+-   Tipo mais comum para conjuntos de dados
+
+-   Uma lista com estrutura adicional (bem nas entranhas de R)
+
+    -   Variáveis - Colunas
+
+    -   Casos - Fileiras
+
+-   Todas as variáveis devem ter o mesmo número dos casos
+
+-   Variáveis têm nomes
+
+-   Casos *podem* ter nomes (não obrigatório)
+
+-   Visualizar a estrutura com `str()`
+
+---
+
+```{r str_mtcars, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+str(mtcars)
+
+```
+
+---
+
+```{r str_mtcars2, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+head(mtcars, n = 3)
+class(mtcars)
+typeof(mtcars)
+```
+---
+
+# Construir um Data.frame
+
+-   Utilizar a função `data.frame()` 
+    -   Fazer uma lista das variáveis e os valores que você quer que elas assumem
+    -   Separar as variáveis com vírgulas
+    -   R atribui tipos de dados para as variáveis que criamos
+
+
+```{r build_df, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+df <- data.frame(name = c("Jim", "Fernanda", "Ana"),
+                 gender = c("male", "female", "female"),
+                 score = c(89, 91, 93),
+                 passed = c(TRUE, TRUE, TRUE))
+str(df)
+```
+
+
+---
+
+
+# Notação `$` 
+
+-   O que é o `$` na função str()?
+    -   `$ name  : chr  "Jim" "Fernanda" "Ana"`
+
+-   `$` separa o nome do `data.frame` do nome de variável
+
+-   `df$name` terá resultado dos 3 nomes
+    -   `r df$name`
+
+-   Notação de colchetes ao final pode selecionar entre os nomes
+    -   `df$name[2]` -> `r df$name[2]` 
+
+---
+
+# Tibble
+
+-   Forma avançada de um `data.frame`
+
+-   Parte do sistema **Tidyverse**
+
+-   Utiliza as mesmas regras que os `data.frame`
+
+-   Estrutura intero um pouco diferente
+
+-   Faster processing (most of the time)
+
+---
+
+class: center, middle, inverse
+# Fluxo de Trabalho de Análise de Dados - "*The Big Picture*"
+
+---
+
+
+```{r diag, echo = FALSE, fig.align='center', out.width = "95%"}
+
+knitr::include_graphics(here(gr, 'grolemund_process_diagram.png'))
+```
+
+---
+
+# Importar Dados
+
+-   Primeiro passo em qualquer projeto em R
+
+-   Fontes dos dados:
+    -   Excel  (.csv or .xlsx) **minha escolha normal**
+    -   Arquivos de texto (.txt or .csv)
+    -   Fasta 
+    -   Arquivos dos outros processos bioinformáticos
+
+-   R não é muito eficiente para preparação dos dados
+
+---
+
+# "*Tidy Data*"
+
+-   Garantir que os dados aparecem numa forma útil para a análise
+
+-   Maioria dos conjuntos de dados são recolhidos e armazenados ao acaso
+    -   Muitos com muito pontos de dados faltando ("*missing data*")
+    -   Valores impossíveis
+        -   O homem de "135" anos
+
+-   Precisa captar esses erros
+    -   Corrigir o que for possível
+    -   Ter uma estratégia clara para lidar com o resto
+    
+---
+
+
+# "*Tidy Data*"
+
+-   Conjunto de princípios sobre a organização dos dados para a análise
+
+-   "Tidyverse"
+    -   Conjunto de pacotes "opinativos" que promovem e utilisam os princípios de formatação "*tidy*"
+
+-   A marca registrada dos "tidy data" é a consistência
+
+---
+
+```{r tidyv, echo = FALSE, fig.align='center', out.width = "60%"}
+knitr::include_graphics(here(gr, 'tidyverse_celestial.png'))
+```
+
+---
+
+# Definição de Hadley Wickham sobre "*Tidy Data*"
+
+> Like families, tidy datasets are all alike, but every messy dataset is messy in its own way.... 
+
+> A dataset is a collection of *values*, usually either numbers (if quantitative) or strings (if qualitative). Values are organized in two ways. 
+
+> Every value belongs to a *variable* and an *observation*. A variable contains all values that measure the same underlying attribute (like height, temperature, duration) across units. An observation contains all values measured on the same unit (like a person, or a day, or a race) across attributes....
+
+> Tidy data is a standard way of mapping the meaning of a dataset to its structure. A dataset is messy or tidy depending on how rows, columns and tables are matched up with observations, variables and types.* 
+
+
+.footnote[*Wickham, Hadley. "Tidy Data". Journal of Statistical Software 59, 10 (2014). https://doi.org/10.18637/jss.v059.i10.]
+
+---
+
+# As Três Regras de Dados "Tidy"
+
+-   Cada variável deve ter sua própria coluna
+
+-   Cada observação (caso) deve ter sua própia fileira
+
+-   Cada valor deve ter sua própria célula*
+
+.footntote[*Wickham and Grolemund, Ch. 12.1.]
+
+
+```{r tidy, echo = FALSE, fig.align='center', out.width = "90%"}
+knitr::include_graphics(here(gr, 'tidy_3_rules.png'))
+```
+
+---
+
+```{r diagb, echo = FALSE, fig.align='center', out.width = "95%"}
+
+knitr::include_graphics(here(gr, 'grolemund_process_diagram.png'))
+```
+
+---
+
+# Exploração dos Dados
+
+-   Nas aulas de estatística iniciais, este é a fase que você pensou era **tudo** de análise de dados
+
+-   Construir modelos
+
+-   Avaliar modelos
+
+-   Testar hípoteses
+
+-   Construir visualizações
+    -   Exploração (para você)
+    -   Apresentação (para o público)
+
+---
+  
+
+# Comunicar Resultados
+
+-   Escrever relatórios, fazer apresentações, etc.
+
+-   *R Markdown* ajuda inestimável em tudo isso
+    -   Todos os slides, lições de casa, etc. preparados em *R Markdown* e *Quarto*
+    
+---
+
+# Divisão de Trabalho Verdadeiro
+
+-   Importar e Limpar Dados - **60 - 70 %**
+
+-   Explorar Dados -    20 - 30 %
+
+-   Communicar Resultados - 10 - 20 %
+

@@ -1,0 +1,781 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Introdução"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "27 de outubro de 2024"
+output:
+  xaringan::moon_reader:
+    css: 
+      - default
+      - css/nhsr.css
+      - css/nhsr-fonts.css
+    lib_dir: libs
+    seal: false
+    nature:
+      highlightStyle: googlecode
+      highlightLines: true
+      highlightLanguage: ["r"]
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      after_body: [css/insert-logo.html]
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+library(tidyverse)
+library(NHSRtheme)
+library(here)
+library(glue)
+library(summarytools)
+library(janitor)
+gr <- here::here("images")
+# set default options
+opts_chunk$set(echo = FALSE,
+               fig.width = 7.252,
+               fig.height = 4,
+               dpi = 300)
+
+# uncomment the following lines if you want to use the NHS-R theme colours by default
+# scale_fill_continuous <- partial(scale_fill_nhs, discrete = FALSE)
+# scale_fill_discrete <- partial(scale_fill_nhs, discrete = TRUE)
+# scale_colour_continuous <- partial(scale_colour_nhs, discrete = FALSE)
+# scale_colour_discrete <- partial(scale_colour_nhs, discrete = TRUE)
+```
+
+
+
+class: middle, center
+```{r}
+include_graphics(here(gr, 'r_module_logo.png'))
+```
+
+---
+
+class: title-slide, left, bottom
+
+
+# `r rmarkdown::metadata$title`
+----
+## **`r rmarkdown::metadata$subtitle`**
+### `r rmarkdown::metadata$author`
+### `r rmarkdown::metadata$date`
+
+---
+class: inverse, middle, center
+
+# Introdução
+
+Onde tudo começa
+
+---
+
+# O Que É Nossa Objetivo
+
+--
+
+*   Aprender análise de dados **em prática**
+    -   Fazer análises de cabo ao rabo
+    -   Com programação (não só clicar botões)
+
+--
+
+*   Utilizar a Linguagem **R**
+
+---
+
+# Professor James Hunter
+
+-   Professor Afiliado, DIPA
+
+-   DSc., Laboratório de Retrovirologia, DIPA, UNIFESP
+
+-   Projeto de Cura de HIV
+
+-   Carreira anterior em consultoria de negócios e urbanismo
+    
+-   Foco em Estatística e Métodos Quantitativos desde 1973
+
+-   Trabalho com R desde 2010
+
+---
+
+# Contato com o Professor
+
+-   email: jameshunterbr@gmail.com
+-   Bluesky: [jimhunterbr](@jimhunterbr.bsky.social)
+-   cel: 11-95629-6628
+-   Office Hours:
+    -   Quinta-feira 14h - 16h
+    -   EP2, Rua Pedro de Toledo 669, 6º Andar Fundos
+
+---
+
+# Filosofia da Matéria 
+
+-   Única maneira para aprender uma linguagem de computação é escrever ela
+
+--
+
+-   Mais código que você escreve, mais fácil será a próxima vez
+
+--
+
+-   Solucionar problemas práticos com R
+
+---
+
+# Don't Panic...
+
+```{r keep_calm, echo = FALSE, fig.align = "center", out.width = "40%"}
+knitr::include_graphics(here(gr, "keep_calm_code.png"))
+```
+
+---
+
+---
+
+# Perguntas
+
+-   Fazem muitas!
+
+-   Se você tiver uma dúvida, outros na turma terão também
+
+-   **Não existe perguntas burras**
+
+---
+
+# Carl Sagan sobre Perguntas Burras
+
+-   Astrofísico que escreveu e era apresentador do programa de TV original **Cosmos**
+
+-  Livro : **The Demon-Haunted World: Science as a Candle in the Dark (O mundo assombrado pelos demônios)**
+
+> There are naive questions, tedious questions, ill-phrased questions, questions put after inadequate self-criticism. But every question is a cry to understand the world. There is no such thing as a dumb question.
+
+---
+
+# Sempre Existe uma Segundo Ponto de Vista
+
+```{r R dumb, echo = FALSE, fig.align = "center", out.width = "90%"}
+knitr::include_graphics(here(gr, "Dilbert_no_dumb_questions.png"))
+```
+
+
+---
+
+# Quanta Matemática Você Precisa Dominar?
+
+-   O que aprendeu no colegial suficiente
+
+-   Não precisa cálculo
+
+-   Somas ( $\Sigma$ ), logaritmos e exponentes
+
+-   Equação de uma linha reta
+
+$$ y = b_0 + b_1x $$
+
+---
+class: center, middle, inverse
+
+# Informação e Conhecimento
+
+---
+
+class: center, middle
+
+> "We are drowning in information, but we are starved for knowledge". -- John Naisbitt
+
+--
+
+Apesar esta frase seja atribuido a futurólogo John Naisbitt, esta citação tem muitos pais e mães. Usei aqui do livro de Danielle Navarro, **Learning statistics with R: A tutorial for psychology students and other beginners**, 2020, http://compcogscisydney.org/learning-statistics-with-r
+
+---
+
+# Porque Nós Precisamos Análise dos Dados?
+
+-   Podemos ver as coisas que estudamos? NÃO
+    -   Vírus, bactérias, células, nucleotídeos, proteínas
+    
+-   Maquinas que produzem os dados genômicas que estudamos são probalísticos
+    -   Palavra "*calling* bases" - sugestão de erro
+
+-   Processo natural de replicação celular ou viral - propenso a erros
+
+-   Resposta humano às doenças, remédios, tratamentos
+    -   Nível alto de incerteza e variancia
+    -   Diferenças naturais entre pessoas
+
+---
+    
+# Estatística Ajuda a Encontrar Verdades Subjacentes
+
+-   Desenvolver conjunto das regras para processar informação que recebemos
+    -   Script/Programa
+
+-   Tirar conclusões que outros podem entender, concordar ou descordar
+
+-   Como alunos, precisam poder conduzir análises básicas
+    -   Modelos e métodos mais avançados ficam com especialistas
+
+---
+
+# Habilidade Necessária para Todo Ciêntista
+-   Entender as estatísticas que você vê em papers e livros
+
+-   Separar o que é importante do que não é importante
+
+-   Separar a verdade de falsidade
+
+-   "Call Bullshit"\* quando você está sendo enganado
+
+-   Resultado: precisamos maneiras probabilísticas para achar essas verdades subjacentes
+
+.footnote[*CT Bergstrom & JD West, **Calling Bullshit: the Art of Skepticism in a Data-driven World**, New York: Random House, 2020.]
+
+
+---
+class: center, middle, inverse
+
+#   R - Uma Ferramenta para Manipulação e Análise dos Dados
+
+---
+
+# CRAN: The Comprehensive R Archive Network
+
+-   Uma ONG educacional quem é o dono do código mãe de R
+
+-   Fonte oficial para cópias do software base e pacotes averiguados por eles
+
+> R is a system for statistical computation and graphics. It consists of a language plus a run-time environment with graphics, a debugger, access to certain system functions, and the ability to run programs stored in script files.
+
+---
+
+# Historia de R
+
+-   Baseada na linguagem de programação estatística ("S") 
+    -   S desenvolvida por Bell Labs em 1976
+    -   Ainda existe como um produto comercial
+    
+-   R desenvolvida por Ross Ihaka e Robert Gentleman em 1995 em Nova Zelândia
+
+-   Comunidade ativa de desenvolvidores e usuários
+
+-   Mais que 19.800 pacotes adicionais disponíveis no repositório de CRAN
+    -   Muitos úteis para as análises biológicas
+    -   Bioconductor -- outro 2.000 pacotes
+    -   Muitos outros espalhados em vários repos (e.g. GitHub)
+
+---
+    
+# Virtudes de R para Análise de Dados
+
+-   Analisar via programas e scripts invés de clicar botões
+    -   Controlar a sequência e opções de operações em sua análise
+
+-   Programas sempre fazem a mesma coisa - produzem mesmo resultado
+    -   Sem surpresas porque você clicou em um butão que mudou sua análise
+    -   Só usam opções e parâmetros que você entende
+
+-   Criar um registro de como você chegou no resultado
+
+-   **De Graça** Sem custo, para sempre!
+    -   Não tem uma versão "estudantil" estupidamente cara
+    -   Nem precisa cópias piratas do software
+    
+---
+
+# A Crise de Reprodutibilidade
+
+-   Sendo capaz de reproduzir análises em tempos diferentes e em labs diferentes
+
+-   Maioria dos estudos científicos não podem ser reproduzidos
+
+-   *Nature*'s Checklist de Reprodutibilidade
+
+> Workflows based on point-and-click interfaces, such as Excel, are not reproducible. Enshrine your computations and data manipulation in code.*
+
+-   R e Python trunfa Excel, Graphpad e seus amigos
+
+.footnote[*Perkel. Challenge to Scientists Nature 584, no. 7822 (2020).]
+
+---
+
+# R - Difícil de Aprender?
+
+-   Se você nunca programou antes, todas as linguagens de computação parecem difíceis ao início
+
+-   R muito mais fácil que a maioria
+
+-   Passos Iniciais
+-   Criar vetores e conjuntos de dados ("*data frames*") 
+    -   Executar funções estatísticas e matemáticas
+    
+-   Vamos começar hoje escrever código
+
+-   R torna mais difícel quando você começa de escrever suas próprias funções
+    -   Quando não pode achar eles nos pacotes que tem
+
+---
+
+# O Que Vocês Devem Fazer
+
+-   Investir tempo entre as aulas
+
+-   Instalar os softwares (R e RStudio) nos seus laptops  
+
+-   Ler o material sugerido aqui
+
+-   Experimente um dos cursos de R Básico no internet 
+    -   Ter um segundo olhar sobre o mesmo material
+
+---
+
+# RStudio -- Comunicação Sofisticada com R
+
+-   Integrated Development Environment ("IDE") para R
+
+-   Disponível desde 2010
+
+-   Sede de *Tidyverse*
+
+-   Onde vocês vão fazer seu trabalho em R
+
+-   Também **De Graça**
+
+---
+# R & Python
+
+-   Python - outra linguagem bastante popular
+    -   Baseada em conceitos similares aos do R
+    -   Outro linguagem de alto-nível interpretada
+
+-   Lançado em 1991
+    -   Guido van Rossum de Holanda
+    -   Nome vem do grupo comédico inglês, "Monty Python's Flying Circus"
+    -   Não a espécie de cobra
+
+-   Para estatística, mais fraco de R
+    -   Precisa funções de vários módulos para conseguir completar operações básicas de estatísticas
+    
+---
+class: center, middle, inverse
+
+# Recoursos para a Matéria
+
+---
+
+# Arquivos, Slides, etc.
+
+-   Arquivado na página do curso no Google Classrom e repo de Github
+
+---
+
+# Leituras Chaves
+
+-   Textos de Estatística
+    -   Diez, Barr & Cetinkaya-Rundel, **OpenIntro Statistics 4**
+    -   Navarro, D. **Learning statistics with R: A tutorial for psychology students and other beginners**
+    
+-   Livros sobre R - Nível Básico
+    -   Wickham & Grolemund, **R for Data Science**
+    -   Ismay & Kim, **Statistical Inference via Data Science: A moderndive into R and the Tidyverse**
+    -   Irizzary, **Introduction to Data Science**
+    -   Frank E. Harrell, **R Workflow** (http://hbiostat.org/rflow/)
+    
+---
+
+# RStudio "*Cheat Sheets*"
+
+Série de resumos de 1 e 2 páginas de um número de pacotes de funções em R
+
+```{r R cheat_base, echo = FALSE, fig.align = "center", out.width = "60%"}
+knitr::include_graphics(here(gr, "base_r_cheat_screen.png"))
+```
+
+---
+
+# Cursos Online
+
+-   edX - Cursos de Harvard sobre R com Prof. R. Irizzary
+    -   <https://www.edx.org/learn/r-programming/harvard-university-data-science-r-basics>
+
+-   Coursera - Cursos de Johns Hopkins sobre R e outros sobre R em aplicações biomedicos
+    -  <https://www.coursera.org/specializations/jhu-data-science> 
+
+-   Coursera - Duke University - sequence of R courses by Cetinkaya-Rundel
+    -   <https://www.coursera.org/specializations/statistics?>
+
+All excellent
+
+---
+# Sites sobre R
+
+-   R Bloggers (https://www.r-bloggers.com/)
+
+-   Tidyverse (https://www.tidyverse.org/learn/)
+
+-   Stack Overflow (https://stackoverflow.com/questions/tagged/r)
+
+-   Twitter (#rstats)
+
+---
+# Sistemas de Ajuda de R e RStudio
+
+-   Completo
+
+-   Toda função tem uma tela de ajuda
+
+-   Escrito por nerds para outros nerds
+    -   Explicações às vezes opacas
+    -   Especialmente mensages de erro
+
+-   Último recurso: copiar a mensagem de erro e colar ele no Google
+    -   Alguém, em algum lugar, também não entendeu a mesma coisa que é problemática para você
+
+---
+# Aplicando Google para um Erro
+
+-   O Erro
+```{r R erro, echo = FALSE, fig.align = "center", out.width = "60%"}
+knitr::include_graphics(here(gr, "error_to_be_googled.png"))
+```
+
+-   Último recurso: copiar a mensagem de erro e colar ele no Google
+    -   Alguém, em algum lugar, também não entendeu a mesma coisa que é problemática para você
+    
+```{r R goog_erro, echo = FALSE, fig.align = "center", out.width = "60%"}
+knitr::include_graphics(here(gr, "googling_an_error.png"))
+```
+
+---
+class: center, middle, inverse
+
+
+# Seu Programa Primeiro
+
+---
+
+# Carregar os Pacotes Importantes
+
+-   Os pacotes mais importantes que potencializam R
+
+-   Usaremos a maioria durante estas 4 semanas
+
+-   Script simples (`pacotes_iniciais.r`)
+
+```{r inst_packs, echo = TRUE, eval = FALSE, mysize=TRUE, size='\\scriptsize'}
+
+packages <- c("tidyverse", "broom", "car", "caret", "corrr", "corrplot", 
+              "data.table", "DescTools", "devtools", "gapminder", "ggpubr", 
+              "ggsci", "glue", "gmodels", "gt", "gtsummary", "here", "Hmisc", 
+              "hms", "janitor", "jsonlite", "kableExtra","knitr", "lattice", 
+              "lubridate",  "nortest", "nycflights13", "paletteer", 
+              "patchwork", "plotly", "palmerpenguins", "pROC", "psych", 
+              "quarto", "Rcpp", "readxl", "reticulate", "ROCR", "shiny", 
+              "styler", "summarytools", "tidymodels", "titanic", "usethis", 
+              "DataExplorer")
+
+install.packages(packages)
+```
+
+---
+# O Que Faz Este Script - Linha 1
+
+-   Linha 1: **atribuição** de conjunto de pacotes ao nome `packages`
+    -   Utiliza `<-` para fazer a atribuição
+
+-   Conjunto de pacotes é combinado num **vetor** de nomes de pacotes
+    -   Função `c()` cria um vetor de vários elementos
+    -   `c()` - *combinar* or *concatenar*
+    -   *vector* - matriz unidimensional
+
+-   Elementos de `packages` - "**strings**" de classe *character*
+    -   Entre aspas ("")
+
+-   Resultado da Linha 1
+
+
+```{r env_pack, echo = FALSE, fig.align='center', out.width = "70%"}
+knitr::include_graphics(here(gr, 'env_packages.png'))
+```
+
+---
+
+# VSS: Operadores de Atribuição
+
+-   Principal: `<-`
+
+-   Pode usar (mas não é considerada uma boa prática) `=`
+    -   **Vai confundir com o sinal para igualdade lógica** `==`
+        -   Vai acontecer! Todos nos fazemos
+
+---
+
+#  O Que Faz Este Script - Linha 2
+
+-   Instala os pacotes que estão no vetor "packages"
+
+-   Procura no site de CRAN (espelho) no internet
+
+-   Faz os downloads e instala os pacotes
+
+-   Vários dos pacotes têm dependências
+    -   Instalará esses pacotes também
+
+-   Dependências: outros pacotes que um pacote precisa para executar as funções do pacote primeiro
+
+---
+
+# Scripts vs. Console
+
+-   Escrever seus comandos num script de R Markdown invés do Console
+    -   Pode salvar seu trabalho
+
+-   Console é o lugar onde os comandos são executados
+    -   Mais fácil de salvar comandos em scripts que salvando a historia dos comandos do Console
+    
+---
+
+# Executar "pacotes_iniciais.r"
+
+-   Download o arquivo do repo da aula para sua pasta de R
+
+-   A aba `Files` no painel inferior direto do RStudio
+    - Clicar em `pacotes iniciais.r`
+
+-   Script abrirá no painel superior esquerdo
+
+-   Clicar no botão `Source` na barra de comandos
+
+-   Pode seguir o progresso no Console
+
+---
+class: center, middle, inverse
+
+#   R - Operações Básicas
+
+---
+# R como um Calculadora
+
+.pull-left[
+```{r calc1, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+5 + 5
+36 * 2500000
+5876/35.44320
+
+```
+]
+
+.pull-right[
+```{r calc2, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+2^25   # exponent
+25 * (12 + 27)
+
+```
+]
+
+---
+
+# Funções Matemáticas em R
+
+```{r calc_table, echo = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+readxl::read_excel(here::here("funcoes_operadores_tabela.xlsx")) %>% 
+  knitr::kable()
+
+```
+
+---
+
+# Funções em Operação
+
+.pull-left[
+
+```{r funcwork, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+sqrt(9849)
+log(377898)
+exp(12.84238)
+```
+
+]
+
+.pull-right[
+
+```{r funcwork2, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+log10(377898)
+round(exp(12.84238), 0)
+```
+]
+
+---
+# Sobre `log()` e `exp()`
+    
+-   No exemplo acima, exponente do 12.84238 é 377898.2, não 377898
+
+-   R relata 5 casas decimais na tela
+    -   Internamente, é 12.8423795969182 (13 casas decimais)
+
+-   Sabemos que $log(x)=e^x$
+
+-   Não quebramos as leis da matemática.
+
+
+```{r calc4, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+x <- 377898
+y <- log(x) # calcular o log de x e atribuir a y
+y
+exp(y)
+
+
+```
+
+---
+# Comentários
+
+-   Linha 2 do script tem um comentário à direta
+```{r calc4comment, echo = TRUE, eval = FALSE, mysize=TRUE, size='\\scriptsize'}
+y <- log(x) # calcular o log de x e atribuir a y
+```
+
+-   Comentários começam com um hashtag `#`
+    -   Tudo à direta do # não será interpretado (executado)
+    -   Podem ser em linhas separadas (até melhor)
+
+-   Comentários nos lembra o que fizemos e porque
+
+-   **Hiper importantes**
+
+-   Usem eles MUITO
+
+---
+# Ordem de Cálculo (*PEMDAS*)
+
+
+```{r pemdas_table, echo = FALSE, mysize=TRUE, size='\\scriptsize'}
+
+readxl::read_excel(here::here("pemdas_pt.xlsx")) %>%
+  knitr::kable()
+
+```
+
+-   Se você retirar os parênteses de `5 * (7 + 2)`? 
+
+-   `5 * 7 + 2` = `r 5 * 7 + 2`
+    
+-   VSS: regras de matemática não mudam porque usamos um computador
+
+---
+# Atribuição
+
+- (nome de objeto) **<-** (definição do objeto) 
+
+- definição = valores que compõem o conteúdo do objeto
+
+---
+# Atribuição - Estilos
+
+- Esses servem
+
+```{r atrib, echo = TRUE}
+x <- 6
+
+x <- "Hi!"
+```
+
+- Esses funcionam mas não recomendo e não uso
+
+```
+x = 6 
+
+6 -> x
+```
+
+- Esse produz um erro (não pode iniciar um comando com um número)
+
+```{r atrib_erro, echo = FALSE, fig.align='center', out.width = "90%"}
+knitr::include_graphics(here(gr, 'atrib_erro.png'))
+```
+
+---
+# Mensagens de Erro Estranhas?
+
+-   Consulte Dr. Google 
+
+
+```{r goog_erro, echo = FALSE, warning = FALSE, fig.align='center', out.width = "80%"}
+knitr::include_graphics(here(gr, 'google_erro.png'))
+```
+
+---
+
+# Atribuição -- Nomes das Variáveis
+
+-   Regras importantes de R
+
+1.    Deve usar só letras (maiúsculas ou minúsculas), números ou símbolos `.` or `_`.
+2.    Deve iniciar o nome com uma **letra**
+
+---
+
+# Nomes das Variáveis -- Corolários
+
+-   Não devem incluir espaços
+    -   "Snake case" supera essa restriçaõ
+        -   Conectar palavras com sublinhar "_"
+
+-   Palavras reservadas de R não podem ser usados como nomes de variáveis
+    -   Exemplos: `TRUE`, `FALSE`, `if`, `else`, `for`, `function`
+
+-   Nomes de variáveis diferenciam maiúsculas de minúsculas
+    -   `Variable` e `variable` são 2 nomes diferentes
+    -   Mesmo para `x` e `X`
+    
+---
+# Casos em R
+
+```{r code_cases, echo = FALSE, fig.align='center', out.width = "80%"}
+
+knitr::include_graphics(here(gr, 'coding_cases.png'))
+```
+
+---
+# Nomes das Variáveis - Ainda Mais
+
+-   Usar nomes claros e informativos
+    -   `x`, apesar de ser popular, é inútil como um nome
+    
+```{r peso, echo = TRUE}
+## 1a versao
+peso <- 55  ## Pessoa pesa 55 kg.
+
+## 2a versao
+peso_kg <- 55 ## Mais claro
+
+## 3a versao, pode converter às libras
+peso_lb <- peso_kg * 2.2
+peso_lb
+```
+
+---
+# Nomes das Variáveis - Último
+
+-   Faça um diccionário dos dados
+    -   Tabela dos nomes das variáveis, qual tipo de dados, e o intervalo dos valores
+    
+-   Tente de fazer os nomes mais curtos possíveis
+
+---
+# Estilo
+
+-   Estilo é importante
+
+-   Guia de Estilo de R
+    -   Wickham, H. **R Style Guide** (https://style.tidyverse.org/)
+  
+- Olhe no documento **style_guide.pdf** no repo da aula/Google Classroom
+ 
