@@ -1,0 +1,207 @@
+---
+title: "R Coding for Fun and Profit - 1"
+subtitle: "Data Types, Variables, Functions"
+author:
+  - name: James R. Hunter, D.Sc.
+    affiliation: Laboratório de Retrovirologia, UNIFESP
+date: last-modified
+format:
+  html:
+    self-contained: true
+    anchor-sections: true
+    code-tools: true
+    code-fold: false
+    code-link: false
+    fig-width: 6
+    fig-height: 4.5
+    code-block-bg: "#f1f3f5"
+    code-block-border-left: "#31BAE9"
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-country: left
+    captions: true
+    cap-country: margin
+    table-captions: true
+    tbl-cap-country: margin
+    reference-country: margin
+
+comments:
+  hypothesis: true
+
+execute:
+  warning: false
+  message: false
+---
+
+# **Let's do some coding!**
+
+I will generally not execute the code in the code blocks below so you can have that pleasure. However, if we do these in class, you will see the effect of these commands there.
+
+# Hello, World!
+
+The universal first attempt at code in any language.
+
+```{r hw1, eval = FALSE, echo = TRUE}
+
+print("Hello, World")
+```
+
+Type this text in your Console and hit `<Enter>`.
+
+Let's make it a bit more personal. We'll add your name. The result we want is "Hello, Jim" or whatever your name is.
+
+To do that, we have to capture your name, which we do with `readline().`
+
+```{r hw2, eval = FALSE, echo = TRUE}
+
+readline("What's your name? ")
+```
+
+::: callout-caution
+## Bug
+
+What's the problem with this attempt?
+
+What are we going to do with the result? How will we feed it into the print?
+:::
+
+We need to save the name in an R object like a string (character vector) and then we can use it.
+
+```{r hw3, eval = FALSE, echo = TRUE}
+
+name <-  readline("What's your name? ")
+name
+print("Hello,", name)
+```
+
+::: callout-caution
+## Bug
+
+We want `print()` to print both elements, the word "Hello, " and the name.
+:::
+
+To combine elements together, we use the command `c()`, with the elements separated by commas.
+
+```{r hw4, eval = FALSE, echo = TRUE}
+
+name <-  readline("What's your name? ")
+print(c("Hello,", name))
+
+```
+
+::: callout-caution
+## Not So Bad Bug
+
+Program ran correctly but did not produce the nice output we want. It printed what we told it to print, the separate elements of the vector we created with c()`.`
+:::
+
+The function `paste()` will combine elements into a single string, as the name implies.
+
+```{r hw5, eval = FALSE, echo = TRUE}
+
+name  <-  readline("What's your name? ")
+print(paste("Hello,", name))
+
+```
+
+## New Commands
+
+-   print()
+
+-   readline()
+
+-   \<- (attribution symbol)
+
+-   c()
+
+-   paste()
+
+# Strings
+
+We can do a lot with strings. We have a data base with various data entered about a number of patients in a study. The people who entered the data were a bit careless. We need to fix these data to make them useful for our analysis. We will take them 1 variable at a time.
+
+Here are the first names of the five patients in the study.
+
+```{r pacnames, eval = TRUE, echo = TRUE}
+
+first_names <- c("Jorge", "susana", "  José", "Maria aparacida", "  RoBERto  ")
+```
+
+We have errors of capitalization and extra white space.
+
+## Tidyverse Functions
+
+We will use the string functions of the tidyverse, which sit in the `stringr` package of functions. This package is also automatically called if you load the `tidyverse` package into memory, which is what we will do with the `library()` command. As you would expect, `library()` loads the library you called. We will check that by executing `sessioninfo().`
+
+```{r load_tidy}
+
+library(tidyverse)
+sessionInfo()
+```
+
+You can see that the `stringr` package we want is listed as loaded under the heading of "other attached packages".
+
+## Capitalization
+
+The first problem appears in the second case: "susana". The first S needs to be upper case. We can use the str_to_title() function in stringr to accomplish this.
+
+```{r cap}
+
+fname <- first_names[2]
+# just assigning a value to a variable will not print it to the screen
+fname <- str_to_title(fname)
+# an external parenthesis will force a result to be printed.
+(fname <- str_to_title(fname)) 
+```
+
+We also have "Maria aparacida" as the fourth name. It also needs capitalization. Can this also be done with `str_to_title()`? Yes, but what about our the capitalization in our last entry: " RoBERto "?
+
+```{r to_title, eval = FALSE, echo = TRUE}
+
+str_to_title(first_names[4:5])
+```
+
+We can apply this function to the entire variable and take care of fixing the capitalization of all the names in one command.
+
+```{r to_title2, eval = FALSE, echo = TRUE}
+
+(first_names <- str_to_title(first_names))
+```
+
+## White Space
+
+Now, to resolve the extra white space in the third and fifth entries. The tidyverse has a command str_trim() that takes care of this.
+
+```{r trim, eval = FALSE, echo = TRUE }
+
+str_trim(first_names[c(3, 5)])
+```
+
+## Combine the Operations
+
+We can successively fix these two conditions in the same block of code as follows:
+
+```{r combine, eval = FALSE, echo = TRUE}
+
+first_names <- str_to_title(first_names)
+first_names # only to show the intermediate result
+first_names <- str_trim(first_names)
+first_names
+```
+
+Next week, we will learn a way that we can make this block more efficient both to type and to execute.
+
+## New Commands and Packages
+
+-   library
+
+-   sessionInfo (watch for the capital I)
+
+-   tidyverse
+
+-   stringr
+
+-   str_to_title()
+
+-   str_trim
