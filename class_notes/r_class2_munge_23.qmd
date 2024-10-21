@@ -1,0 +1,629 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Data Munging e o Tidyverse"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2023-10-03"
+format:
+  revealjs:
+    theme: serif
+    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, summarytools, janitor, knitr)
+gr <- here::here("graphics")
+```
+
+# Tidy Data {background-color="blue" background-image="graphics/dplyr_wrangling.png"}
+
+## Resumo de um *Data Frame*/*Tibble*
+
+-   Estrutura geral dos dados
+    -   Quantas variáveis
+    -   Quais tipos
+-   Utilize ou `str()` ou `glimpse()`
+    -   `str()` - Base R
+    -   `glimpse()` - `tibble`
+
+## `soro` como Exemplo {.smaller}
+
+```{r load_soro, echo = FALSE, mysize=TRUE, size='\\tiny'}
+
+soro <- read_csv(here::here("einstein_soro_tests.csv"), 
+                 col_types = "ccccccfncc", 
+                 na = c("Não reagente", "NULL", "NA"))
+str(soro)
+
+```
+
+## `glimpse()` Alternativo a `str()` {.smaller}
+
+```{r soro2, echo = TRUE, mysize=TRUE, size='\\tiny'}
+
+tibble::glimpse(soro)
+
+```
+
+## Ver em Mais Detalhe {.smaller}
+
+-   `summarytools::dfSummary()`
+
+    -   Resumo curto de cada variável no conjunto
+
+    -   Presentação baseado no tipo da variável
+
+    -   Muitas opções
+
+    -   Eu deixo fora a coluna "graph"
+
+        -   `graph.col = FALSE` para omitir
+
+```{r eval = FALSE}
+library(summarytools)
+dfSummary(soro, graph.col = FALSE)
+```
+
+## Variável *pacid* {.smaller}
+
+```{r dfsumm1, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+library(summarytools)
+dfSummary(soro$pacid, graph.col = FALSE)
+
+```
+
+## Variável *dt_collect* {.smaller}
+
+```{r dfsumm2, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+
+dfSummary(soro$dt_collect, graph.col = FALSE)
+
+```
+
+## Variável *analysis* {.smaller}
+
+```{r dfsumm3, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+
+dfSummary(soro$analysis, graph.col = FALSE)
+
+```
+
+## Variável *result* {.smaller}
+
+```{r dfsumm4, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+
+dfSummary(soro$result, graph.col = FALSE)
+
+```
+
+## Variáveis *unit* *reference* *sex* {.smaller}
+
+```{r dfsumm5, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+
+dfSummary(soro[,5:7], graph.col = FALSE)
+
+```
+
+## Variável *birth_yr* {.smaller}
+
+```{r dfsumm6, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+
+dfSummary(soro$birth_yr, graph.col = FALSE)
+
+```
+
+## Variável *uf*
+
+```{r dfsumm7, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+
+dfSummary(soro$uf, graph.col = FALSE)
+
+```
+
+## Variável *city*
+
+```{r dfsumm8, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+
+dfSummary(soro$city, graph.col = FALSE)
+```
+
+# Munging Este Conjunto dos Dados {background-color="blue"}
+
+## Tasks {.smaller}
+
+-   `dt_collect`: formato não padronizado, caractere
+    -   Transformar para Date com funções do pacote `lubridate`
+-   `analysis`: tem maneiras diferentes para designar o mesmo teste
+    -   Pode isolar o nome de anticorpo com as funções de `stringr`
+-   `result`: problema de `Não reagente` como 0
+    -   Outros valores string
+    -   Resolver os valores string e transformar a `numeric`
+-   `unit`: somente um valor
+    -   Retirar do conjunto: não útil para a análise
+    -   Utilize `janitor::remove_constant()`
+-   `reference`: 3 valores; qual é a utilidade da variável?
+    -   Pode atribuir valores úteis para os 3 valores ou retirar
+
+# Limpar os Nomes das Variáveis {background-color="blue"}
+
+## Limpeza dos Nomes
+
+-   Primeiro passo de *munging* universal
+
+-   Nossos nomes já são limpos
+
+-   `janitor::clean_names()`
+
+## Exemplo da Limpeza dos Nomes
+
+```{r cleann, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+test_df <- as.data.frame(matrix(ncol = 6))
+names(test_df) <- c("firstName", "$abc@!*", "% successful (2009)",
+                    "REPEAT VALUE", "REPEAT VALUE", "")
+test_df
+
+# apply clean_names()
+
+test_df <- janitor::clean_names(test_df)
+
+test_df
+
+```
+
+## Atribuir Nomes às Variáveis
+
+-   Pode usar `names()` para criar nomes para suas variáveis
+
+-   Nomes precisam ser num vetor com o mesmo número de itens que o número das colunas
+
+-   `names(test_df) <-` para receber o vetor
+
+```         
+names(test_df) <- c("first_name", "last_name", 
+                  "percent_successful_2009", 
+                  "value_1", "value_2", "standard")
+```
+
+# *Munging* as Variáveis {background-color="blue"}
+
+## Traduzir Datas do Formato Texto a *Date*
+
+-   Formato atual de `dt_collect`
+    -   *String* em "dd/mm/yyyy" (08/06/2020)
+    -   Formato padrão brasileiro
+
+## Analisando o Formato {.smaller}
+
+-   Pacote `lubridate`
+-   Nomes das funções combinações das 1ªs letras de *day*, *month*, *year*
+    -   Na ordem que aparece na data
+    -   Em nosso caso, usaríamos `dmy()`
+-   Se fosse um data padrão americano ("mm/dd/yyyy")
+    -   Função seria `mdy()`
+-   `lubridate` tem todas as possibilidades
+-   Todos os formatos funcionam com qualquer separador
+    -   Ignora os
+
+## Conversão das Datas com *lubridate*
+
+```{r datesr, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+br_text <- "28/05/2020"
+(br_date <- dmy(br_text)) 
+
+us_text <- "05-28-2020"
+(us_date <- mdy(us_text))
+```
+
+# Sequências das Funções -- *Pipe* {background-color="blue"}
+
+## Necessidade de Ligar Funções {.smaller}
+
+-   De forma que podemos mais tarde entender e lembrar
+
+-   Exemplo teórico (de Ismay e Kim, **ModernDive**)
+
+    -   *Data frame* `x`
+    -   Funções `f()`, `g()`, e `h()`
+
+-   Sequência das ações:
+
+    -   Começa com `x` então
+    -   Use `x` como uma entrada para a função `f()` então
+    -   Use o resultado da `f(x)` como uma entrada para a função `g()` então
+    -   Use o resultado da `g(f(x))` como uma entrada para a função `h()`
+
+-   Solução de parênteses aninhados
+
+    -   `h(g(f(x)))`
+
+    -   Fácil a entender -- **NÃO**
+
+## Operador *Pipe* (\|\>)
+
+-   Pega o que está no lado esquerdo do operador
+
+-   Ele torna primeiro argumento da função no lado direto
+
+-   Quer dizer "e então"
+
+-   Forma alternativa "%\>%" (de Tidyverse)
+
+## Exemplo Utilizando o Pipe
+
+```         
+x |>  
+  f() |> 
+  g() |> 
+  h()
+```
+
+1.  Pega `x` e então
+
+2.  Use este resultado como a entrada para próxima função `f()` e então
+
+3.  Use este resultado como a entrada para próxima função `g()` e então
+
+4.  Use este resultado como a entrada para próxima função `h()`
+
+# *mutate()* Function - Modificar (e Adicionar) Variáveis {background-color="blue"}
+
+## Fundamentos de *mutate()*
+
+-   `dplyr::mutate()`
+    -   1º argumento: *data frame* ou *tibble* a ser modificado
+    -   2º argumento: modificação na forma de atribuição
+        -   **Aqui** atribuição usa "=" não "\<-"
+
+## Atribuição em `mutate()`
+
+-   Nome de variável no lado esquerdo
+
+-   Se este nome de variável não existe no *tibble*, If variable name does not exist in tibble, ele será adicionado
+
+-   Se variável existente, substuir o valor atual
+
+    -   **VSS**: Copiar seu *tibble* primeiro para um novo objeto
+
+## Quais Funções Pode Usar no `mutate()`
+
+```{r mut_funcs, echo = FALSE, fig.align='center', out.width = "20%"}
+
+knitr::include_graphics(glue::glue(gr, '/mutate_funcs.png'))
+```
+
+## Modificar *dt_collect* com `mutate()`
+
+1.  Criar o nome da nova versão do *tibble*
+
+2.  Atribuir para ele os dados da versão antiga
+
+3.  Transformar a data para o classe `Date`
+
+## Código Que Faz Isso
+
+```{r trans_date, echo = TRUE, mysize=TRUE, message = FALSE}
+
+soro_b <- soro |> # steps 1 and 2; note use of Pipe
+  dplyr::mutate(dt_collect = dmy(dt_collect)) # step 3
+
+glimpse(soro_b$dt_collect)  
+
+```
+
+# Limpar as Categorias de `analysis`
+
+## Lembrete
+
+-   `analysis` teve 2 maneiras para referir a cada um dos 2 anticorpos
+-   Queremos reduzir variável para os valores "IgG" e "IgM" só
+
+```{r table_analysis, echo = TRUE}
+table(soro$analysis)
+```
+
+## *mutate()* com *ifelse()* {.smaller}
+
+-   Todos os valores incluem o nome do anticorpo
+
+    -   "IgG" or "IgM"
+
+-   Podemos procurar dentro de *string* para *sub-string* "IgG"
+
+    -   Se caso o tem, pode atribuir esse valor para a `analysis`
+        -   Senão, atribuir o outro valor ("IgM")
+
+-   Use `ifelse()` para tomar esta decisão
+
+-   Porque tem um número pequeno de valores (2),
+
+    -   Transformar `analysis` em `factor`
+
+-   Fazer a pesquisa com `stringr::str_detect(var, pattern)`
+
+    -   `var`: variável a ser pesquisadoable to be searched
+    -   `pattern`: padrão que quer procurar
+    -   `str_detect(analysis, "IgG")`
+
+## Código para `mutate()`
+
+```{r trans_analysis, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+soro_b <- soro %>% 
+  mutate(analysis = ifelse(str_detect(analysis, "IgG"), "IgG", "IgM")) %>% 
+  mutate(analysis = factor(analysis))
+
+glimpse(soro_b$analysis)
+
+```
+
+## Outra Maneira para Modificar `analysis` com `forcats` {.smaller}
+
+-   Use funções de `forcats` para manipular `analysis`
+
+-   `forcats`: funções que manipulam *factors*
+
+-   Começar por transformar `analysis` para o tipo de dado `factor`
+
+-   Chamar `factor()`
+
+```{r fact_anal, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+x <- c("a", "b", "c")
+glimpse(x)
+
+fct_x <- factor(x)
+glimpse(fct_x)
+
+```
+
+-   Valores agora: 1, 2, 3
+-   *Levels*: a, b, c
+
+## Aplicar a `analysis`
+
+-   Vamos manipular os níveis de `analysis`
+
+```{r fct_trans, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+soro_b <- soro |> 
+  mutate(analysis_f = factor(analysis))
+glimpse(soro_b$analysis_f)
+levels(soro_b$analysis_f)
+table(soro_b$analysis_f)
+
+```
+
+## *fct_collapse()* Aplicado a `analysis` 
+
+-   `forcats::fct_collapse()`: reduzir o número de níveis baseado em valores da variável
+
+-   **Não esqueça o Cheat Sheet: "Factors with forcats"**
+
+-   Porque teremos 2 níveis finais ("IgG" ou "IgM")
+
+    -   Precisa definir cada um separadamenteNeed to define each separately
+
+## Code for This
+
+```{r fct_coll, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+soro_b <- soro |>
+  mutate(analysis_f = factor(analysis)) |>
+  mutate(analysis_f = fct_collapse(analysis_f, 
+                                   IgG = c("COVID IgG Interp", "IgG, COVID19"),
+                                   IgM = c("COVID IgM Interp", "IgM, COVID19")))
+glimpse(soro_b$analysis_f)
+fct_count(soro_b$analysis_f)
+
+```
+
+## Forma Mais Compacta para Obter o Mesmo Resultado
+
+```{r fct_coll2, echo = TRUE, eval = FALSE, mysize=TRUE, size='\\scriptsize'}
+soro_b <- soro |>
+mutate(analysis_f = fct_collapse(factor(analysis), 
+                                 IgG = c("COVID IgG Interp", "IgG, COVID19"),
+                                 IgM = c("COVID IgM Interp", "IgM, COVID19")))
+```
+
+# Valores Não-Númericos em `result`
+
+## Problema - Valores *String* `result` {.smaller}
+
+-   "Não reagente" e "Reagente"
+
+```{r summ_res, warning = FALSE, message = FALSE, echo = FALSE, mysize=TRUE, size='\\tiny'}
+dfSummary(soro$result, graph.col = FALSE)
+
+```
+
+## Base R - Estratégia {.smaller}
+
+-   Tratar "Não reagente" como 0
+
+-   Tratar "Reagente" e *strings* em branco como NA
+
+-   Use `for` *loop* para testar todos os casos
+
+-   Use `if...then...else` para testar os valores e fazer as trocas
+
+```         
+soro_b <- soro
+for(i in 1:nrow(soro_b)){
+  if(soro_b$result[i] == "Nao reagente") {
+    soro_b$result[i] <- 0
+    } else {
+      if(soro_b$result[i] %in% c("Reagente", "")){  
+        soro_b$result[i] <- NA
+      } # end second if
+    }  # end else
+  }  # end of if
+}  # end of loop
+soro_b$result <- as.numeric(soro_b$result)  
+# above line is what made else test optional
+```
+
+## Tidyverse: *mutate()* & *ifelse()*
+
+-   Mesma Lógica
+
+```{r res_ifthen, message = FALSE, warning = FALSE, echo = TRUE, , mysize=TRUE, size='\\tiny'}
+
+soro_b <- soro %>% 
+  mutate(result = as.numeric(ifelse(result == "Não reagente", 0, result))) 
+summarytools::dfSummary(soro_b$result, graph.col = FALSE)
+
+```
+
+# New Problem with *result()* {.smaller}
+
+-   What is that 30.8 Value?
+
+-   Mean = 1.7
+
+-   Value is `r round((30.8 - 1.7)/5.5, 2)` standard deviations outside mean
+
+-   Reference value from `reference` is "\<=0.90"
+
+    -   This value 30 times higher than reference
+
+-   **Outlier**
+
+-   Important Issue in statistics
+
+-   Lesson: Take careful note of range of numerical values
+
+    -   Problem to be solved during analysis phase
+
+# Retirar Variáveis Desnecessárias {background-color="blue"}
+
+## Retirar `unit`
+
+-   Use `janitor::remove_constant()`
+
+-   `unit` só tem 1 valor: "AU/ml"
+
+-   Não existe variância para medir
+
+-   `remove_constant()`: retira colunas que tem só 1 valor (mais NA)
+
+```{r fix_unit, echo = FALSE}
+
+soro$unit <- ifelse(soro$unit == "AU/ml", "AU/ml", NA)
+
+```
+
+```{r unit_df, echo = TRUE}
+
+table(soro$unit, useNA = "ifany")
+
+```
+
+## Retirar `unit` - 2
+
+```{r remove_unit, echo = TRUE}
+
+soro_b <-  soro %>% 
+  janitor::remove_constant(na.rm = TRUE)
+glimpse(soro_b)
+
+```
+
+## Retirar `reference` com *dplyr::select()*
+
+-   `reference` só tem um valor útil: "\<=0.90"
+
+```{r ref_df, echo = TRUE}
+
+table(soro$reference, useNA = "ifany")
+
+```
+
+## `select()`: 2º Verbo Importante de `dplyr`
+
+-   Funciona com colunas (variáveis)
+
+-   Se queremos incluir colunas em uma operção
+
+    -   `select()` elas positivamente em argumentos
+
+-   Se queremos excluir colunas em uma operação
+
+    -   `select()` elas negativamente em argumentos
+
+## Exemplo Simples de `select()` 
+
+```{r ex_select, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+a <- tibble(x = c("a", "b", "c"),
+            y = 1:3,
+            z = c("d", "e", "f"))
+a #show the tibble on the screen
+
+a |> select(y) #just show the selected variable
+
+```
+
+## Retirar Variáveis com `select(-var)`
+
+```{r toy_remove, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+a
+a |> select(-x)
+```
+
+## Retirar `reference` com `dplyr::select()`
+
+```{r remove_ref, echo = TRUE, mysize=TRUE, size='\\tiny'}
+
+soro_b <- soro %>% 
+  select(-reference)
+glimpse(soro_b)
+```
+
+## Transformar `uf` para um `factor`
+
+```{r}
+soro_b <- soro %>% 
+  mutate(uf = factor(uf))
+glimpse(soro_b$uf)
+```
+
+## Combinar Todas as Ops com o *Pipe*
+
+-   Usar o *pipe*, podemos combinar todas essas operações em um comando grande
+
+```{r munge_tot, warning = FALSE, message = FALSE, echo = TRUE}
+
+soro_b <- soro %>% 
+  mutate(dt_collect = dmy(dt_collect)) %>% 
+  mutate(analysis = factor(analysis)) %>% 
+  mutate(analysis = fct_collapse(analysis, 
+                                 IgG = c("COVID IgG Interp", "IgG, COVID19"),
+                                 IgM = c("COVID IgM Interp", "IgM, COVID19"))) %>%
+  mutate(result = as.numeric(ifelse(result == "Não reagente", 0, result))) %>% 
+  janitor::remove_constant(na.rm = TRUE) %>%  # unit variable
+  select(-reference) %>% 
+  mutate(uf = factor(uf))
+```
+
+## Resultado Final de *Munging*
+
+```{r munge_tot2, warning = FALSE, message = FALSE, echo = F}
+glimpse(soro_b)  
+```
+
+# `soro_b` Segue a Definição de "*Tidy*"? {background-color="blue"}

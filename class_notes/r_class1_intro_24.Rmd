@@ -44,8 +44,6 @@ opts_chunk$set(echo = FALSE,
 # scale_colour_discrete <- partial(scale_colour_nhs, discrete = TRUE)
 ```
 
-
-
 class: middle, center
 ```{r}
 include_graphics(here(gr, 'r_module_logo.png'))
@@ -380,11 +378,12 @@ class: center, middle, inverse
     -   Navarro, D. **Learning statistics with R: A tutorial for psychology students and other beginners**
     
 -   Livros sobre R - Nível Básico
-    -   Wickham & Grolemund, **R for Data Science**
-    -   Ismay & Kim, **Statistical Inference via Data Science: A moderndive into R and the Tidyverse**
-    -   Irizzary, **Introduction to Data Science**
     -   Frank E. Harrell, **R Workflow** (http://hbiostat.org/rflow/)
-    
+    -   Irizzary, **Introduction to Data Science**
+    -   Ismay & Kim, **Statistical Inference via Data Science: A moderndive into R and the Tidyverse**
+    -   David Keyes, **R for the Rest of Us: A Statistics-Free Introduction** (https://book.rfortherestofus.com)
+    -   Wickham & Grolemund, **R for Data Science**
+ 
 ---
 
 # RStudio "*Cheat Sheets*"
@@ -408,7 +407,7 @@ knitr::include_graphics(here(gr, "base_r_cheat_screen.png"))
 -   Coursera - Duke University - sequence of R courses by Cetinkaya-Rundel
     -   <https://www.coursera.org/specializations/statistics?>
 
-All excellent
+Todos excelentes!
 
 ---
 # Sites sobre R

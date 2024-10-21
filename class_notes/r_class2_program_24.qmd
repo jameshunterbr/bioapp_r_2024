@@ -1,0 +1,812 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Programação em R"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-11-05"
+format:
+  revealjs:
+    theme: serif
+#    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, janitor, knitr)
+gr <- here::here("images")
+
+```
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 70%
+include_graphics(here(gr, 'r_module_logo.png'))
+```
+
+# Scripts e Programação {background-color="blue" background-image="graphics/program.jpg"}
+
+## Porque Scripts?
+
+-   Combinar comandos em um conjunto coerente
+
+-   Gravar seus comandos
+
+    -   Reutilizar ou recordar em data posterior
+
+-   Facilitatar correção dos erros e re-execução do programa
+
+-   Scripts podem ser
+
+    -   Documentos individuais (arquivos `.r`)
+
+    -   Blocos de código em um documento `.rmd` ou `.qmd` maior
+
+    -   Como este
+
+## Scripts Básicos
+
+-   Abrir um novo documento script (`.r`) com
+
+    -   CTRL-Shift-N
+
+    -   Icone mais (+) Plus icon no canto superior esquerdo da tela
+
+-   Editor de texto é um editor simples
+
+-   Exemplo
+
+    -   Atribuir frase: "Hello, world?" à variável `phrase`
+
+    -   Imprima `phrase` na tela
+
+## Texto de Programa
+
+```{r}
+#| label: prog_text_exec
+#| echo: false
+#| fig.align: center
+#| out.width: 90%
+knitr::include_graphics(glue::glue(gr, '/first_script.png'))
+```
+
+```{r}
+
+#| label: prog_text
+#| eval: false
+#| echo: true
+phrase <- "Hello, world"
+print(phrase)
+
+```
+
+-   Executar programa com botões `Run` ou `Source`
+
+# Loops {background-color="blue"}
+
+## Geral
+
+-   Maneira para executar uma série de comandos repetidamente
+
+-   Executa série de comandos até chega numa condição que termina execução
+
+-   2 Sabores
+
+    -   **for** loops
+
+    -   **while** loops
+
+## `for` Loops {.smaller}
+
+-   Formato
+
+<!-- -->
+
+```         
+for(var in vector) {
+  code
+  code
+  code
+}
+```
+
+-   `for` inicia loop
+
+-   Número de repetições de loop especificado dentro dos parênteses
+
+    -   Repetições:
+
+        -   `var` -- nome de variável de índice
+
+        -   `vector` -- valores que a variável pode assumir
+
+        -   {} - par de chaves
+
+    <!-- -->
+
+    -   Dentro das chaves: linhas de código que quer executar
+
+## `for` Loop - Exemplo {.smaller}
+
+-   Calcular o quadrado de números inteiros entre 5 e 10
+
+-   Representar a variável como `i`
+
+-   Vetor
+
+    -   `c(5, 6, 7, 8, 9, 10)` ou `5:10`
+
+```{r echo = TRUE}
+for(i in 5:10){ 
+  print(i^2)
+}
+
+```
+
+## O Que Fez o Loop {.smaller}
+
+-   1ª Iteração
+
+    -   Atribuiu 5 a `i`
+
+    -   Calculou o quadrado de `i` (`i^2`)
+
+    -   Escreveu `i` a tela (25)
+
+-   2ª Iteração
+
+    -   Atribuiu 6 a `i`
+
+    -   Calculou o quadrado de `i` (`i^2`)
+
+    -   Escreveu `i` a tela (36)
+
+-   Mesma coisa para as iterações 3ª a 6ª
+
+-   Ao final da 6ª iteracão (`i` \<- 10)
+
+    -   Não conseguiu achar um novo valor para atribuir para `i`
+
+    -   **Parou**
+
+## Exemplo de Brinquedo - `Cats_meow.r`
+
+-   Seu gato miou 4 vezes
+
+-   Você quer repetir isso na tela
+
+-   Usando um `for loop` faz um script que imprime "meow" na tela 4 vezes
+
+## Exemplo Mais Realista
+
+-   Transformar um string de DNA em um vetor das letras
+
+-   Comprimento do string --- desconhecido
+
+-   Comprimento pode ser determinado com função `nchar()`: retorna número de carateres
+
+## Loop de DNA String
+
+```{r echo = TRUE}
+
+seq <- "CCTCAAATCACTCTTTGGCAACGACCCTTAGTCACAATAAAAGTAGGGGA"
+seq_length <- nchar(seq)
+seq_vector <- character(seq_length) # create vector to hold result
+for (i in 1:nchar(seq)) {
+  seq_vector[i] <- str_to_lower(str_sub(seq, i, i))
+}
+seq_vector
+```
+
+## `while` Loop
+
+-   Estrutura parecida a aquela de `for` loop
+
+    -   Mas funciona da forma diferente
+
+-   Repete até a condição dentro da constatação `while` vira `FALSE`
+
+-   Utilizado muito menos que os loops `for`
+
+# Cat's Meow - 2 {background-color="blue"}
+
+## Loops v. Programação *Vectorizada* {.smaller}
+
+-   R é vetorizado
+
+    -   Intérprete agirá sobre todos os elementos de um vetor simultaneamente
+
+    -   Não precisa fazer um loop item por item
+
+-   Devemos usar loops?
+
+-   A velocidade dos computadores hoje em dia reduz a vantagem dos comandos vetorizados
+
+    -   Excluindo conjuntos de dados MUITO grandes, loops são funcionalmente equivalentes
+
+    -   Milhões dos casos, centenas de variáveis
+
+-   Não desiste de usar loops
+
+    -   O lógico dos loops é geralmente mais fácil para programar que muitas funções vetorizadas
+
+-   Assim, pode poupar muito tempo de programação
+
+# Declarações Condicionais (*if...then...else*) {background-color="blue"}
+
+## Problema Conceitual
+
+-   Estamos lendo sequências de nucleotides
+
+    -   Alfabeto DNA: ACGT
+
+    -   Alfabeto RNA: ACGU
+
+-   Possível dizer:
+
+    -   *Se* a sequência é DNA, então o alfabeto é ACGT
+
+-   Versão mais completa
+
+    -   *Se* a sequência é DNA, *então* o alfabeto é ACGT *senão* o alfabeto é ACGU.
+
+## Declarações `If` em R
+
+-   Estrutura básica
+
+<!-- -->
+
+```         
+if(condition) {
+  code
+  code
+  code
+  } else {
+      code
+      code
+      code
+}
+```
+
+## Exemplo Simples: Sem Cláusula `else`
+
+```{r echo = TRUE}
+x <-  0
+
+if (x == 0) {
+  print("x equals 0")
+}
+```
+
+## Teste Lógico Mais Completo
+
+```{r echo = TRUE}
+
+x <-  0
+
+if (x == 6) {
+  print("x equals 6")
+} else {
+    print("x does not equal 6")
+  }
+```
+
+## 3 Condições Aninhadas -- DNA/RNA
+
+```{r echo = TRUE}
+seq_type <- "DNA"
+
+if (seq_type == "DNA") {
+  print("ACGT")
+} else {
+    if (seq_type == "RNA"){
+      print("ACGU")
+    } else {
+      print("sequence neither DNA nor RNA")
+    }
+  }
+```
+
+## 2ª Opção
+
+```{r echo = TRUE}
+
+seq_type <- "RNA"
+
+if (seq_type == "DNA") {
+  print("ACGT")
+} else {
+    if (seq_type == "RNA"){
+      print("ACGU")
+    } else {
+      print("sequence neither DNA nor RNA")
+    }
+  }
+```
+
+## Última `else`
+
+```{r echo = TRUE}
+
+seq_type <- "George"
+
+if (seq_type == "DNA") {
+  print("ACGT")
+} else {
+    if (seq_type == "RNA"){
+      print("ACGU")
+    } else {
+      print("sequence neither DNA nor RNA")
+    }
+  }
+
+```
+
+## Função`ifelse()`
+
+-   Para testes lógicos simples
+
+-   `ifelse(test, true, false)`
+
+-   3 argumentos
+
+    -   `test`: teste lógico
+
+    -   `true`: resultado se TRUE
+
+    -   `false`: resultado se FALSE
+
+-   Se resultado é TRUE, retorna valor `true`
+
+-   Se resultado é FALSE, retorna valor `false`
+
+## Exemplo `ifelse()`
+
+```{r echo = TRUE}
+x <- 2
+res <- ifelse(x > 10, "greater than", "less than or equal to") 
+paste("x is", res, "10")
+```
+
+## Lógico *if...then...else* Mais Complicado
+
+-   Funcão no pacote `dplyr`: `case_when()`
+
+-   Pode manusear mais facilmente grande número de casos alternativos
+
+-   Mais avançado --- ficará num exercício
+
+# Importar Arquivos para R {background-color="blue"}
+
+## Tipos com os quais Trabalharemos
+
+-   Arquivos delimitados por vírgula (.csv)
+
+-   Arquivos Excel (.xls ou .xlsx)
+
+-   Arquivos FASTA
+
+# Arquivos Delimitados por Vírgula (.csv) {background-color="blue"}
+
+## Importar Arquivo .csv {.smaller}
+
+-   Um arquivo de texto simples em formato retangular
+
+-   Campos separados por vírgulas
+
+-   Excel pode interpretar
+
+-   Tipo mais comum que vai importar
+
+-   Use `readr::read_csv()` para importar
+
+-   Função lê o arquivo
+
+    -   Trata as vírgulas na mesma maneira que Excel: separadores entre colunas
+
+    -   Importa arquivo no formato de **tibble**
+
+```{r echo = FALSE, fig.align='center', out.width = "90%"}
+knitr::include_graphics(here(gr, 'read_csv_help.png'))
+```
+
+## Argumentos de `read_csv()`
+
+\- `file =` caminho para chegar no arquivo
+
+-   `here::here()`
+
+\- `col_names =` A primeira fileira contem os nomes das colunas?
+
+-   `TRUE`\` quer dizer 1º fileira tem os nomes das colunas; `read_csv()` assume isso
+
+-   `FALSE` quer dizer que 1ª fileira tem dados invés dos nomes
+
+## `col_types =` Argument {.smaller}
+
+-   `read_csv()` tentará a adivinhar o tipo de dados correto baseado no contéudo da coluna
+
+-   Se você quer deixar R adivinhar, entre `NULL` ou não inclua o argumento
+
+-   Se você quer especificar os tipos das colunas, use um string de caracteres da lista:
+
+-   ::::: columns
+    ::: {.column width="50%"}
+    -   c = character
+
+    -   i = integer
+
+    -   n = number
+
+    -   d = double
+
+    -   l = logical
+
+    -   f = factor
+    :::
+
+    ::: {.column width="50%"}
+    -   D = date
+
+    -   T = date time
+
+    -   t = time
+
+    -   ? = guess
+
+    -   \\- to skip the column
+    :::
+    :::::
+
+## Info re: `col_types =`
+
+-   O *string* de `col_types =` deve ter **exatamente** o mesmo número de caracteres que os dados têm colunas
+
+    -   Se tiver um conjunto de dados com 5 colunas, o *string* deve ter 5 caracteres
+
+    -   Ex. `col_types = "cfn-c"`
+
+    -   Quer dizer *character-factor-numeric-skip-character*
+
+## Dois Outros Argumentos Chaves {.smaller}
+
+-   Para especificar dados em falta (*missing data*)
+
+    -   `read_csv()` assume que dados em falta teria um dos códigos seguintes
+
+        -   o *string* "NA" or um string em branco
+
+    -   Se os dados usam outros códigos, você precisa especificar eles
+
+        -   "99" é um indicador comum nas ciências sociais
+
+    -   Neste caso, especifique o argumento `na =` como `na = c("", "NA", "99")`
+
+-   Pular linhas: `skip =`
+
+    -   Conjuntos de dados com metadados etc nas primeiras fileiras
+
+    -   Para pular essas, coloque um valor positivo no argumento `skip =`
+
+    -   Ex. `skip = 4` começará ler os dados na linha 5
+
+## Exemplo .csv Simples
+
+-   `hiv_sk_mini.csv` contem informação sobre carga viral e CD4+ em grupo de pacientes que também sofrem da Sarcoma de Kaposi
+
+    -   Id, subtipo, data de nascimento, idade, ano de diagnose com HIV, CD4, carga viral
+
+```{r echo = FALSE, fig.align = "center", out.width = "70%"}
+
+knitr::include_graphics(here(gr, 'hiv_sk_mini_report.png'))
+```
+
+## Importar \`hiv_sk_mini.csv\`
+
+-   Atribuir a função um nome para o data frame: `hiv_sk`
+
+-   Execute um comando simplificado sem uma especificação de colunas
+
+    -   R vai adivinhar
+
+```{r eval = FALSE, echo = TRUE, message = TRUE}
+
+hiv_sk <- read_csv(here::here("hiv_sk_mini.csv"))
+hiv_sk
+```
+
+## Resultado {.smaller}
+
+```{r echo = FALSE, eval = TRUE, message = TRUE}
+hiv_sk <- read_csv(here("hiv_sk_mini.csv"))
+hiv_sk
+```
+
+## `hiv_sk_mini.csv` Resultados
+
+-   1ª linha teve nomes das variáveis; R utilizou eles
+
+-   Se quiséssemos especificar colunas, poderíamos ter usado
+
+    -   `col_types = "cccnnnn"`
+
+## Conjunto de Dados Mais Complexo
+
+-   Este é o exemplo que utilizaremos durante o processo da limpeza dos dados
+
+-   Versão de dados sobre testes sorológicos para COVID-19 do Hospital Albert Einstein
+
+    -   Versão com 99 casos
+    -   `einstein_soro_tests.csv`
+
+-   "messy", ie. dados verdadeiros
+
+## Contéudo
+
+```{r echo = FALSE, out.width = "80%", fig.align = "center"}
+
+knitr::include_graphics(here(gr, 'einstein_soro_libre_calc.png'))
+```
+
+## Construir o Comando para Importar {.smaller}
+
+-   Nomes das variáveis ficam na primeira linha
+
+    -   `col_names =` pode deixar fora
+
+-   Não precisa `skip =`
+
+-   `NA` argumento
+
+    -   `result` e `unit` variables usam "Não reagente" e "NULL"
+
+-   `birth_yr` tem 3 valores `NA`
+
+    -   Não está claro se significam 0 ou eles não conseguirem obter um resultado significativo
+
+    -   Inserir o argumento: `na = c("Não reagente", "NULL", "NA")`
+
+## Argument `col_types =` {.smaller}
+
+-   `pacid`: estranho, mas obviamente uma string
+
+-   `dt_collect`: `Date`, mas em um formato fora de padrão
+
+    -   R irá analisar como tipo de caractere
+
+    -   Podemos reformatar na fase de limpeza dos dados (*tidy*) We can reformat it in tidying phase
+
+-   `analysis`: string de caractere
+
+-   `result`: deve ser númerico, mas tem casos com strings
+
+    -   R irá analisar como tipo de caractere
+
+-   `unit` & `reference`: strings de caractere
+
+    -   `reference` pode ser númerico, mas tomar decisão na fase de *tidy*
+
+-   `sex`: `character`, mas melhor como `factor`: somente 2 valores
+
+-   `birth_yr`: `numeric`
+
+-   `uf` & `city`: `character`
+
+-   Utilizando códigos, argumento inteiro: `col_types = "ccccccfncc"`
+
+## Pronto para Importar
+
+```{r import_einstein1, eval = TRUE, echo = TRUE}
+einstein_soro <- read_csv(here::here("einstein_soro_tests.csv"), 
+                          col_types = "ccccccfncc", 
+                          na = c("Não reagente", "NULL", "NA"))
+glimpse(einstein_soro)
+```
+
+# Aquivos Excel {background-color="blue"}
+
+## Conselho sobre Trabalho *dentro* de Excel - 1 {.smaller}
+
+-   Se você prepara arquivos *.csv*,
+
+    -   Guardar tipos de dados diferentes em arquivos diferentes
+
+-   Se você prepara arquivos *.xlsx*,
+
+    -   Guardar tipos de dados diferentes em abas diferentes
+
+-   Dados devem ser colocados em um bloco solido
+
+    -   Nenhuma linha em branca
+
+-   Primeira linha deve ter nomes das variáveis, se você usa eles
+
+-   Todas as colunas devem ter **só** um classe de dados
+
+    -   `Numeric`, `character`, `logical`, ...
+
+## Conselho sobre Trabalho *dentro* de Excel - 2 {.smaller}
+
+-   Zeros são sempre "0"
+
+    -   Nunca "-", espaço ou qualquer outro caractere
+
+-   Dados em falta devem sempre ser "NA"
+
+    -   Nunca "0", "99" ou outro texto
+
+-   Comece aqui fazer os dados conformar às regras de *tidy data*
+
+    -   Cada coluna deve ser uma **variável**
+
+    -   Cada linha deve ser um **caso**
+
+-   **Nunca** use cores ou elementos de desenho
+
+## Importar Arquivos de Excel {.smaller}
+
+-   Não precisa salvar arquivos como ".csv" como passo intermediário
+
+-   Pacote `readxl`
+
+    -   `read_excel()`
+
+    -   Funciona com formatos .xls e .xlsx igualmente
+
+-   Difere de `read_csv()` principalmente no tratamento de tipos de colunas
+
+-   Também tem argumentos para
+
+    -   Especificar abas dentro da planilha (*workbook*)
+
+    -   Especificar região dentro de uma aba
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 80%
+knitr::include_graphics(here(gr, 'read_excel_command.png'))
+```
+
+## Argumentos de `read_excel()`
+
+-   Especificar o que vai baixar
+
+    -   Caminho para arquivo
+
+    -   Nome da aba
+
+-   `range`: no formato normal de Excel: "A1:B25"
+
+-   `col_names =` funciona da mesma forma que `read_csv()`
+
+-   `na =` e `skip =` funciona da mesma forma que `read_csv()`
+
+## Tipos de Coluna em `read_excel()` {.smaller}
+
+-   Utiliza palavras inteiras invés das letras únicas
+
+-   Se você quer criar um `factor`, precisa fazer isso na fase de limpeza
+
+-   Tipos de coluna:
+
+    -   date
+
+    -   guess (confia na escolha de R)
+
+    -   list
+
+    -   logical
+
+    -   numeric
+
+    -   skip
+
+    -   text
+
+## Exemplo Spreadsheet
+
+-   Conjunto de dados de padrão R: Palmer Penguins
+
+<!-- -->
+
+-   8 características de 344 pinguins
+
+    -   `penguins.xlsx`
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 80%
+knitr::include_graphics(here(gr, 'penguins_excel.png'))
+```
+
+## Argumentos deste Exemplo
+
+-   Tipos de coluna
+
+    -   Argumento desnecessário porque R vai analisar os valores corretamente
+
+-   Se quiser especificar tipos
+
+    -   `col_types = c("text", "text", "numeric", "numeric", "numeric", "numeric", "text", "numeric)`
+
+-   Necessário para as colunas de medidas porque tem dados de falta
+
+    -   `na = "NA"`
+
+## Importar Arquivo
+
+```{r read_peng_xl, eval = TRUE, echo = TRUE}
+penguin <- readxl::read_excel(here::here("penguins.xlsx"), na = "NA")
+glimpse(penguin)
+```
+
+# Arquivos FASTA {background-color="blue"}
+
+## Ler um Arquivos FASTA {.smaller}
+
+-   Formato mais comum para nucleotides (DNA or RNA) e aminoácidos
+
+-   Representação baseada em texto usando códigos de uma única letra (alfabetos)
+
+-   Cada sequência tem uma linha com o nome e comentários antes da sequência
+
+    -   Tem "\>" como 1º caráter
+
+-   Arquivo de texto (como um arquivo .csv)
+
+-   Para preparar sequências para análise
+
+    -   Pacotes especializados para leitura e análise
+
+-   Pacote `bioseq` tem funções simples e completos
+
+    -   Instalar na sua maquina com `install.packages("bioseq")`
+
+-   `bioseq::read_fasta()` precisa 2 argumentos
+
+    -   nome de arquivo e caminho
+
+    -   Tipo de sequência: "DNA" (padrão), "RNA" ou "AA"
+
+## Exemplo Arquivo FASTA
+
+-   Sequências DNA da poliproteína *gag* do vírus HIV-1
+
+    -   Genome de referência HXB-2
+
+-   Sequência fica no arquivo `HIVHXB.fa`
+
+-   Sequência tem 1,503 pares base
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 80%
+knitr::include_graphics(here(gr, 'fasta_text_ed.png'))
+```
+
+## Importar o Arquivo
+
+```{r import_fasta, eval = TRUE, echo = TRUE}
+seq <- bioseq::read_fasta(here::here("HIVHXB.fa"), "DNA")
+stringr::str_sub(seq, 1, 60)
+```
+
+-   Resultado um vetor de caracteres
+
+-   Primeiros 60 nucleotides utilizando a funcão de subconjunto (*subsetting*) do pacote `stringr`
+
+# Fine Parte 2

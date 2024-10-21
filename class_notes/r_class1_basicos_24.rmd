@@ -586,9 +586,17 @@ str(df)
 
 -   Utiliza as mesmas regras que os `data.frame`
 
--   Estrutura intero um pouco diferente
+-   Estrutura interno um pouco diferente
 
 -   Faster processing (most of the time)
+
+---
+# Vetores até Tibbles
+
+```{r vecflow, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here(gr, 'vector flowchart.png'))
+```
 
 ---
 

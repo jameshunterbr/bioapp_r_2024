@@ -1,0 +1,333 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Projetos em R"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-11-05"
+format:
+  revealjs:
+    theme: serif
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, janitor, knitr)
+gr <- here::here("images")
+
+```
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 70%
+include_graphics(here(gr, 'r_module_logo.png'))
+```
+
+## Semana Passada
+
+-   Falamos das variáveis e estruturas de variáveis
+
+    -   `vector`, `data.frame`, `tibble`
+
+## Hoje
+
+-   Falamos de como usar esses objetos
+
+    -   Como combinar em *frases* que executam comandos e análises
+    -   Loops
+    -   Declarações condicionais (*if ... then ... else*)
+
+# Projetos em R e RStudio {background-color="blue"}
+
+## Pastas Ativas
+
+-   Quando você inicia RStudio
+
+-   Programa usa a pasta que você definiu em "Tools/Global Options"
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 70%
+knitr::include_graphics(here(gr, 'default_dir.png'))
+```
+
+## `setwd()` & `getwd()` {.smaller}
+
+-   Para criar uma nova pasta ativa (*working directory*), precisa usar o comando \`setwd()\`
+
+    -   Com o **nome completo do caminho** em aspas como argumento
+
+-   Exemplo - minha pesquisa da tese de doutorado sobre HIVAIDS
+
+    -   `setwd(C:/Users/james/OneDrive/Documents/HIVAIDS/Drug_Holiday")`
+
+-   Função complentária `getwd()`
+
+    -   Sem argumento
+
+    -   Mostra o que é a pasta ativa
+
+```{r}
+getwd()
+```
+
+## Porque Precisamos Projetos? {.smaller}
+
+-   Vai trabalhar em projetos diferentes
+
+    -   Bases de dados diferentes
+
+    -   *Scripts* (programas) diferentes
+
+    -   Documentos diferentes
+
+-   Jogando todos seus arquivos de todos os projetos em uma pasta R vai enloquecer você
+
+    -   Muitos projetos podem ter acima de 500 arquivos
+
+-   Planejamento do fluxo do projeto implica organização
+
+-   Construir um projeto de análise de dados em R baseado num espaço de trabalho distinto e reservado
+
+## Projetos em RStudio -- Trabalho Feito Melhor {.smaller}
+
+-   Tudo mundo tem uma estrutura diferente das pastas nos seus computadores
+
+    -   Tenho projetos gerais de computação na pasta R
+
+    -   Todos meus projetos sobre HIV ficam em minha pasta HIVAIDS
+
+    -   Todas as versões desta matéria ficam na minha pasta MAD
+
+-   O que é a estrutura das suas pastas?
+
+-   Projetos de R criam sua pasta ativa própria
+
+-   Se for na rede de trabalho seria a mesma estrutura para tudo mundo no grupo
+
+-   Não tem mais os caminhos de pasta quilomêtricos
+
+-   Que implica digitando eles errados
+
+## The Tidyverse Warning/Threat!
+
+### A Equipe Tidyverse ameaça:
+
+> **Se a primeira linha de um script de R é:**
+
+`setwd("C:\Users\jenny\path\that\only\I\have")`
+
+Alguém da equipe virá para seu escritório e **incendiar o seu computador**
+
+**Você foi avisado!!!**
+
+A melhora maneira a evitar tal consequência é criar um novo projeto de RStudio para cada nova atividade.
+
+## Projetos
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 80%
+knitr::include_graphics(here(gr, 'projects_here.png'))
+```
+
+::: aside
+Source: Alison Horst, https://github.com/allisonhorst/stats-illustrations/blob/master/rstats-artwork
+:::
+
+## Como Criar um Projeto de RStudio
+
+::::: columns
+::: {.column width="40%"}
+-   Procure o texto `Project:(None)`
+
+-   No topo da tela acima de aba de *Environment*
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 90%
+knitr::include_graphics(here(gr, 'tela_inicial_proj.png'))
+```
+:::
+:::::
+
+-   Até agora, não tem um projeto **ativo**
+
+## Criar Novo Projeto
+
+::::: columns
+::: {.column width="40%"}
+-   Clique na seta a direta do "(None)"
+
+-   Menu suspenso abrirá
+
+-   Clique opção `New Project …`
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 90%
+knitr::include_graphics(here(gr, 'proj_drop_down_menu.png'))
+```
+:::
+:::::
+
+## Criar Janela do Projeto
+
+-   Opções para escolher uma pasta nova ou existente
+
+-   Opção `Version Control` mais avançada
+
+-   Neste caso, escolhe `New Directory`
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 90%
+knitr::include_graphics(here(gr, 'create_project_1.png'))
+```
+
+## Tipos de Projetos Novos
+
+-   RStudio tem muitos tipos de projetos
+
+-   Por enquanto, queremos um *New Project* simples: clique lá
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 60%
+knitr::include_graphics(here(gr, 'create_2_type_proj.png'))
+```
+
+## Tela de Criação do Projeto Final
+
+-   Dê um nome e um locale no disco
+
+-   Clique o botão `Create Project`
+
+-   Por enquanto, esqueça as caixas de `git` e `renv`
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 60%
+knitr::include_graphics(here(gr, 'proj_directory.png'))
+
+```
+
+## Eis Seu Projeto
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 80%
+knitr::include_graphics(here(gr, 'proj_created.png'))
+```
+
+## Sub-Pastas {.smaller}
+
+-   Projetos podem tornar muito grande, **MUITO GRANDE**
+
+    -   Projeto de tese project: 1.978 arquivos, 383 sub-pastas, 425 MB
+
+-   Sub-pastas para arquivos de tipos diferentes
+
+    -   Parece a criação de um projeto
+
+    -   Ajuda organizar os arquivos
+
+-   Sempre guardar dados brutos longe de qualquer outro tipo de arquivo de dados
+
+    -   Tratados, sub-conjuntos, etc.
+
+    -   Você vai precisar eles de novo!
+
+## Minha Estrutura das Pastas Preferida {.smaller}
+
+-   Sub-pastas
+
+    -   Dados
+
+    -   Dados brutos
+
+    -   Documentos
+
+    -   Gráficos
+
+    -   Programas/Scripts
+
+    -   Slides
+
+## Here
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: 60%
+knitr::include_graphics(here(gr, 'here.png'))
+```
+
+::: aside
+Source: Alison Horst, https://github.com/allisonhorst/stats-illustrations/blob/master/rstats-artwork/here.png
+:::
+
+## Problema  {.smaller}
+
+-   Vários projetos e várias pastas podem ter caminhos (*paths*) muito diferentes
+
+-   Caminho para chegar no `test_proj` no meu velho laptop Windows:
+
+    -   `C:/Users/james/OneDrive/Documents/MAD/test_proj`
+
+-   Caminho para chegar no `test_proj` no meu novo Mac Air:
+
+    -   `/Users/jameshunter/Documents/MAD/test_proj`
+
+-   Se eu quis utilisar meu caminho para ir para um sub-pasta `graphics` nas duas maquinas
+
+    -   **Seria um desastre**
+
+## Solução: `here::here()`
+
+-   Pacote `here` faz uma coisa só
+
+    -   Mostra para você o caminho completo para sua pasta ativa
+
+    -   Numa forma simples: não tem argumentos
+
+```{r echo = TRUE}
+
+here::here()
+```
+
+## Ir à Sub-Pasta `graphics` do Projeto {.smaller}
+
+-   Give the function the argument `"graphics"`
+
+-   Thereafter, can use variable `gr` to refer to full path of location
+
+```{r echo = TRUE}
+gr <- here::here("graphics")
+gr
+```
+
+# Fine Parte 1
