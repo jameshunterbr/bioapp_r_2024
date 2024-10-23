@@ -1,26 +1,20 @@
+## Bioinformática Aplicada
 
-## Bioinformática Aplicada 
+## Modulo R
 
-## Modulo R 
-
-Aqui vou depositar os arquivos que vamos usar nas aulas de R no eletivo
-de Biomedicina para Novembro até Dezembro de 2024.
+Aqui vou depositar os arquivos que vamos usar nas aulas de R no eletivo de Biomedicina para Novembro até Dezembro de 2024.
 
 ### Datas e Tópicos
 
 -   5 de Novembro - Intro a R; Tipos dos Dados
 
--   12 de Novembro - Conceitos Básicos de Programação em R; Loops;
-    Condicionais; Tidyverse
+-   12 de Novembro - Conceitos Básicos de Programação em R; Loops; Condicionais; Tidyverse
 
--   19 de Novembro - Gráficos em R; Pacotes; Sequências Genômicas;
-    Bioconductor
+-   19 de Novembro - Gráficos em R; Pacotes; Sequências Genômicas; Bioconductor
 
--   26 de Novembro - Alinhamento Genômico em R; Big Data; Inferência
-    Estatística
+-   26 de Novembro - Alinhamento Genômico em R; Big Data; Inferência Estatística
 
--   03 de Dezembro - Modelos e Machine Learning; Acesso às Bases de
-    Dados Biológicas com R
+-   03 de Dezembro - Modelos e Machine Learning; Acesso às Bases de Dados Biológicas com R
 
 -   10 de Dezembro - O Mundo Estranho de Rev. Bayes
 
@@ -29,6 +23,8 @@ de Biomedicina para Novembro até Dezembro de 2024.
 -   Intro24.pdf
 
 -   instalacao_software.pdf
+
+-   Tidyverse_style_guide.pdf
 
 ### Arquivos - Aula 1
 
@@ -45,3 +41,5 @@ de Biomedicina para Novembro até Dezembro de 2024.
 -   aula_2_programacao_24.pdf
 
 -   aula_2_munging_24.pdf
+
+-   licao_de_casa_2_24.pdf
