@@ -1,0 +1,159 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Styling e Linting"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-11-19"
+format:
+  revealjs:
+    theme: serif
+#    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, summarytools, janitor, knitr)
+gr <- here::here("images")
+```
+
+# Estilo de Código {background-color="blue"}
+
+## Estilo Conta!
+
+-   Escrevemos código não só para ser executado
+-   Pessoas precisam ler
+-   Você precisa ler
+    -   Até meses, anos depois
+-   Precisa ter sentido
+
+## Tidyverse Style Guide
+
+-   Cópia no Github
+
+-   Existem várias guias para estilo correto
+
+-   São todas relacionadas
+
+    -   Google, Tidyverse, outros
+
+-   Gosto de Tidyverse; vamos usar este
+
+## Pacote `styler`
+
+-   Instalado com os pacotes iniciais
+
+-   Baseado na guia do estilo de Tidyverse
+
+-   Examina um arquivo
+
+-   Faz as mudanças necessárias para colocar ele em um estilo bom.
+
+## Exemplo de `styler::style_file()`
+
+-   Código fora de padrão
+
+```{r bad_code1, eval = FALSE}
+
+A=c(6,10,12,14,16,20,22,24,26,30)
+b=c("gato", "cachorro",     "peixe", "rato",             "galinha")
+x=list(a, b)
+
+sumA=sum(A)
+div_a=A[4]/A[1]
+```
+
+## Linhas #1 & 2
+
+```{r bad_code2, eval = FALSE}
+
+A=c(6,10,12,14,16,20,22,24,26,30)
+b=c("gato", "cachorro",     "peixe", "rato",             "galinha")
+```
+
+-   ::: {#line1 .incremental}
+    -   "=" invés de "\<-"
+
+    -   Irregular - espaço branco
+    :::
+
+## Linhas #4 & 5
+
+```{r bad_code3, eval = FALSE}
+
+sumA=sum(A)
+div_a=A[4]/A[1]
+```
+
+::: {#line4 .incremental}
+-   "=" invés de "\<-"
+
+-   Espaço branco na divisão em volta da "/"
+:::
+
+## Como Usar `styler`
+
+```{r styler1, echo = FALSE, fig.align='center', out.width = "20%"}
+
+knitr::include_graphics(here(gr, 'bad_style_w_addins.png'))
+
+```
+
+1.  Clicar nos **Addins**
+
+2.  Rolar para baixo para área de **STYLER**
+
+3.  Clicar no **"Style Active File"**
+
+4.  Styler vai fazer as correções dos erros que ele conhece
+
+    -   *Automático*
+
+5.  Salvar o arquivo com um novo nome
+
+## Nosso Arquivo com Correções
+
+```{r better_style, eval = FALSE}
+
+A <- c(6, 10, 12, 14, 16, 20, 22, 24, 26, 30)
+b <- c("gato", "cachorro", "peixe", "rato", "galinha")
+x <- list(a, b)
+
+sumA <- sum(A)
+div_a <- A[4] / A[1]
+
+```
+
+# Linting
+
+## O Que É
+
+-   Indica o que são os erros de formatação do código
+
+-   Comentários muito mais detalhados que `styler`
+
+-   Mas, não faz as mudanças
+
+-   Produz um relatório no window de "Markers" com os comentários
+
+-   Executar da mesma maneira que "Style Active File" com o "Addin" **Lint**
+
+## Resultado - Lint 
+
+```{r lint1, echo = FALSE, fig.align='center', out.width = "20%"}
+
+knitr::include_graphics(here(gr, 'lintr_result.png'))
+
+
+```
