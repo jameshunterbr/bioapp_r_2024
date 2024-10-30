@@ -28,7 +28,7 @@ pacman::p_load(tidyverse, here, summarytools, janitor, knitr)
 gr <- here::here("images")
 ```
 
-# Tidy Data {background-color="blue" background-image="images/dplyr_wrangling.png"}
+# Tidy Data {background-color="blue"}
 
 ## Resumo de um *Data Frame*/*Tibble*
 
@@ -116,6 +116,33 @@ dfSummary(soro$result, graph.col = FALSE)
 dfSummary(soro[,5:7], graph.col = FALSE)
 
 ```
+
+## Funcão Alternativa {.smaller}
+
+-   Função `skimr::skim`
+
+    -   Alternativa: `skimr::skim_without_charts()`
+
+    -   All results in tibbles
+
+    -   Charts are mini-histograms
+
+```{r skimer, eval = FALSE}
+skimx <- skimr::skim_without_charts(soro)
+
+```
+
+## Tibble of Result
+
+```{r  print_skimmer, echo = FALSE}
+skimx <- skimr::skim_without_charts(soro)
+skimx |> 
+  select(skim_variable, n_missing, complete_rate, character.n_unique, numeric.mean)
+```
+
+::: callout-note
+Não como aparece; tem mais variáveis e formatação
+:::
 
 # Munging Este Conjunto dos Dados {background-color="blue"}
 
@@ -595,3 +622,81 @@ glimpse(soro_b)
 ```
 
 # `soro_b` Segue a Definição de "*Tidy*"? {background-color="blue"}
+
+# Outra Função: `tidyr::pivot_...` {background-color="blue"}
+
+```{r tidy_pivot, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here(gr, 'tidy_pivot.png'))
+```
+
+## O Que É Um "Pivot"
+
+-   Planilha - formato largo ("*wide*")
+
+-   Para muitas gráficas e tabelas - precisamos formato alto ("*long/tall*")
+
+-   As funções `tidyr::pivot_longer()` e `tidyr::pivot_wider()` transforma dados **largos** em dados **longos**
+
+    -   E vice-versa
+
+    -   Remodelando ("*reshaping*") dados
+
+## `pivot_longer()` **- Argumentos**
+
+-   `data`: O conjunto a ser pivotado.
+
+-   `cols`: Quais colunas seriam transformado para formato longo.
+
+-   `names_to`: Nome da nova coluna onde os nomes das colunas pivotados seriam gravados.
+
+-   `values_to`: Nome da nova coluna onde os valores pivotados seriam gravadosThe name of the new column that will store the pivoted values.
+
+## `pivot_longer()` **- Exemplo**
+
+-   Conjunto de dados simples: três meses de contagens de células CD4 em 3 pacientes
+
+```{r piv_long_ex}
+
+library(tidyr)
+cd4_contagem <- data.frame(
+  paciente = c("A", "B", "C"),
+  jan = c(500, 600, 300),
+  fev = c(450, 700, 320),
+  mar = c(520, 640, 310)
+)
+gt::gt(cd4_contagem)
+
+```
+
+## Transformar para Formato Longo com `pivot_longer()` {.smaller}
+
+```{r piv_long_ex2}
+
+cd4_long <- pivot_longer(cd4_contagem, cols = jan:mar, 
+                         names_to = "mes", values_to = "cd4")
+gt::gt(cd4_long)
+```
+
+## Transformar para Formato Largo com `pivot_wider()` {.smaller}
+
+-   Pode inverter este processo
+
+```{r pivot_wide}
+
+cd4_wide <- pivot_wider(cd4_long, names_from = "mes", values_from = "cd4")
+gt::gt(cd4_wide)
+
+```
+
+::: callout-note
+Voltou ao format original
+:::
+
+## Vantagens e Desvantagens de Formato Longo
+
+-   Facilita análises e gráficos detalhadas
+
+-   Permite manipulação dos dados mais fácilmente
+
+-   MAS, format largo mais fácil de ler e entender
