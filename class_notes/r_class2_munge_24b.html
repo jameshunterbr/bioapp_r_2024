@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="r_class2_munge_24_files/libs/clipboard/clipboard.min.js"></script>
-<script src="r_class2_munge_24_files/libs/quarto-html/tabby.min.js"></script>
-<script src="r_class2_munge_24_files/libs/quarto-html/popper.min.js"></script>
-<script src="r_class2_munge_24_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="r_class2_munge_24_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="r_class2_munge_24_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="r_class2_munge_24_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="r_class2_munge_24_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="r_class2_munge_24b_files/libs/clipboard/clipboard.min.js"></script>
+<script src="r_class2_munge_24b_files/libs/quarto-html/tabby.min.js"></script>
+<script src="r_class2_munge_24b_files/libs/quarto-html/popper.min.js"></script>
+<script src="r_class2_munge_24b_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="r_class2_munge_24b_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="r_class2_munge_24b_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="r_class2_munge_24b_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="r_class2_munge_24b_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.57">
 
   <meta name="author" content="James R. Hunter, PhD">
@@ -16,8 +16,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="r_class2_munge_24_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="r_class2_munge_24_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="r_class2_munge_24b_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="r_class2_munge_24b_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -96,11 +96,11 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="r_class2_munge_24_files/libs/revealjs/dist/theme/quarto.css">
-  <link href="r_class2_munge_24_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="r_class2_munge_24_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="r_class2_munge_24_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="r_class2_munge_24_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="r_class2_munge_24b_files/libs/revealjs/dist/theme/quarto.css">
+  <link href="r_class2_munge_24b_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="r_class2_munge_24b_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="r_class2_munge_24b_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="r_class2_munge_24b_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
   .callout {
@@ -409,7 +409,7 @@ James R. Hunter, PhD
   <p class="date">2024-11-05</p>
 </section>
 <section>
-<section id="tidy-data" class="title-slide slide level1 center" data-background-color="blue" data-background-image="images/dplyr_wrangling.png">
+<section id="tidy-data" class="title-slide slide level1 center" data-background-color="blue">
 <h1>Tidy Data</h1>
 
 </section>
@@ -624,6 +624,53 @@ No   Variable      Stats / Values      Freqs (% of Valid)   Valid      Missing
 --------------------------------------------------------------------------------</code></pre>
 </div>
 </div>
+</section>
+<section id="funcão-alternativa" class="slide level2 smaller">
+<h2>Funcão Alternativa</h2>
+<ul>
+<li><p>Função <code>skimr::skim</code></p>
+<ul>
+<li><p>Alternativa: <code>skimr::skim_without_charts()</code></p></li>
+<li><p>All results in tibbles</p></li>
+<li><p>Charts are mini-histograms</p></li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>skimx <span class="ot">&lt;-</span> skimr<span class="sc">::</span><span class="fu">skim_without_charts</span>(soro)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="tibble-of-result" class="slide level2">
+<h2>Tibble of Result</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+   skim_variable n_missing complete_rate character.n_unique numeric.mean
+   &lt;chr&gt;             &lt;int&gt;         &lt;dbl&gt;              &lt;int&gt;        &lt;dbl&gt;
+ 1 pacid                 0         1                     97          NA 
+ 2 dt_collect            0         1                     46          NA 
+ 3 analysis              0         1                      4          NA 
+ 4 result               39         0.606                 39          NA 
+ 5 unit                 47         0.525                  1          NA 
+ 6 reference             0         1                      3          NA 
+ 7 uf                    0         1                      3          NA 
+ 8 city                 11         0.889                  5          NA 
+ 9 sex                   0         1                     NA          NA 
+10 birth_yr              3         0.970                 NA        1979.</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Não como aparece; tem mais variáveis e formatação</p>
+</div>
+</div>
+</div>
 </section></section>
 <section>
 <section id="munging-este-conjunto-dos-dados" class="title-slide slide level1 center" data-background-color="blue">
@@ -673,19 +720,19 @@ No   Variable      Stats / Values      Freqs (% of Valid)   Valid      Missing
 <section id="exemplo-da-limpeza-dos-nomes" class="slide level2">
 <h2>Exemplo da Limpeza dos Nomes</h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>test_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">matrix</span>(<span class="at">ncol =</span> <span class="dv">6</span>))</span>
-<span id="cb10-2"><a href=""></a><span class="fu">names</span>(test_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"firstName"</span>, <span class="st">"$abc@!*"</span>, <span class="st">"% successful (2009)"</span>,</span>
-<span id="cb10-3"><a href=""></a>                    <span class="st">"REPEAT VALUE"</span>, <span class="st">"REPEAT VALUE"</span>, <span class="st">""</span>)</span>
-<span id="cb10-4"><a href=""></a>test_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>test_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">matrix</span>(<span class="at">ncol =</span> <span class="dv">6</span>))</span>
+<span id="cb12-2"><a href=""></a><span class="fu">names</span>(test_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"firstName"</span>, <span class="st">"$abc@!*"</span>, <span class="st">"% successful (2009)"</span>,</span>
+<span id="cb12-3"><a href=""></a>                    <span class="st">"REPEAT VALUE"</span>, <span class="st">"REPEAT VALUE"</span>, <span class="st">""</span>)</span>
+<span id="cb12-4"><a href=""></a>test_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  firstName $abc@!* % successful (2009) REPEAT VALUE REPEAT VALUE   
 1        NA      NA                  NA           NA           NA NA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="co"># apply clean_names()</span></span>
-<span id="cb12-2"><a href=""></a></span>
-<span id="cb12-3"><a href=""></a>test_df <span class="ot">&lt;-</span> janitor<span class="sc">::</span><span class="fu">clean_names</span>(test_df)</span>
-<span id="cb12-4"><a href=""></a></span>
-<span id="cb12-5"><a href=""></a>test_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a><span class="co"># apply clean_names()</span></span>
+<span id="cb14-2"><a href=""></a></span>
+<span id="cb14-3"><a href=""></a>test_df <span class="ot">&lt;-</span> janitor<span class="sc">::</span><span class="fu">clean_names</span>(test_df)</span>
+<span id="cb14-4"><a href=""></a></span>
+<span id="cb14-5"><a href=""></a>test_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  first_name abc percent_successful_2009 repeat_value repeat_value_2  x
 1         NA  NA                      NA           NA             NA NA</code></pre>
@@ -741,13 +788,13 @@ No   Variable      Stats / Values      Freqs (% of Valid)   Valid      Missing
 <section id="conversão-das-datas-com-lubridate" class="slide level2">
 <h2>Conversão das Datas com <em>lubridate</em></h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>br_text <span class="ot">&lt;-</span> <span class="st">"28/05/2020"</span></span>
-<span id="cb15-2"><a href=""></a>(br_date <span class="ot">&lt;-</span> <span class="fu">dmy</span>(br_text)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a>br_text <span class="ot">&lt;-</span> <span class="st">"28/05/2020"</span></span>
+<span id="cb17-2"><a href=""></a>(br_date <span class="ot">&lt;-</span> <span class="fu">dmy</span>(br_text)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "2020-05-28"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a>us_text <span class="ot">&lt;-</span> <span class="st">"05-28-2020"</span></span>
-<span id="cb17-2"><a href=""></a>(us_date <span class="ot">&lt;-</span> <span class="fu">mdy</span>(us_text))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a>us_text <span class="ot">&lt;-</span> <span class="st">"05-28-2020"</span></span>
+<span id="cb19-2"><a href=""></a>(us_date <span class="ot">&lt;-</span> <span class="fu">mdy</span>(us_text))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "2020-05-28"</code></pre>
 </div>
@@ -847,10 +894,10 @@ No   Variable      Stats / Values      Freqs (% of Valid)   Valid      Missing
 <section id="código-que-faz-isso" class="slide level2">
 <h2>Código Que Faz Isso</h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">|&gt;</span> <span class="co"># steps 1 and 2; note use of Pipe</span></span>
-<span id="cb20-2"><a href=""></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">dt_collect =</span> <span class="fu">dmy</span>(dt_collect)) <span class="co"># step 3</span></span>
-<span id="cb20-3"><a href=""></a></span>
-<span id="cb20-4"><a href=""></a><span class="fu">glimpse</span>(soro_b<span class="sc">$</span>dt_collect)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">|&gt;</span> <span class="co"># steps 1 and 2; note use of Pipe</span></span>
+<span id="cb22-2"><a href=""></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">dt_collect =</span> <span class="fu">dmy</span>(dt_collect)) <span class="co"># step 3</span></span>
+<span id="cb22-3"><a href=""></a></span>
+<span id="cb22-4"><a href=""></a><span class="fu">glimpse</span>(soro_b<span class="sc">$</span>dt_collect)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Date[1:99], format: "2020-05-28" "2020-05-11" "2020-06-16" "2020-06-10" "2020-04-30" ...</code></pre>
 </div>
@@ -868,7 +915,7 @@ No   Variable      Stats / Values      Freqs (% of Valid)   Valid      Missing
 <li>Queremos reduzir variável para os valores “IgG” e “IgM” só</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href=""></a><span class="fu">table</span>(soro<span class="sc">$</span>analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href=""></a><span class="fu">table</span>(soro<span class="sc">$</span>analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 COVID IgG Interp COVID IgM Interp     IgG, COVID19     IgM, COVID19 
@@ -906,11 +953,11 @@ COVID IgG Interp COVID IgM Interp     IgG, COVID19     IgM, COVID19
 <section id="código-para-mutate" class="slide level2">
 <h2>Código para <code>mutate()</code></h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">%&gt;%</span> </span>
-<span id="cb24-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis =</span> <span class="fu">ifelse</span>(<span class="fu">str_detect</span>(analysis, <span class="st">"IgG"</span>), <span class="st">"IgG"</span>, <span class="st">"IgM"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis =</span> <span class="fu">factor</span>(analysis))</span>
-<span id="cb24-4"><a href=""></a></span>
-<span id="cb24-5"><a href=""></a><span class="fu">glimpse</span>(soro_b<span class="sc">$</span>analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis =</span> <span class="fu">ifelse</span>(<span class="fu">str_detect</span>(analysis, <span class="st">"IgG"</span>), <span class="st">"IgG"</span>, <span class="st">"IgM"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis =</span> <span class="fu">factor</span>(analysis))</span>
+<span id="cb26-4"><a href=""></a></span>
+<span id="cb26-5"><a href=""></a><span class="fu">glimpse</span>(soro_b<span class="sc">$</span>analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Factor w/ 2 levels "IgG","IgM": 2 1 1 2 2 2 2 1 2 2 ...</code></pre>
 </div>
@@ -925,13 +972,13 @@ COVID IgG Interp COVID IgM Interp     IgG, COVID19     IgM, COVID19
 <li><p>Chamar <code>factor()</code></p></li>
 </ul>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>)</span>
-<span id="cb26-2"><a href=""></a><span class="fu">glimpse</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>)</span>
+<span id="cb28-2"><a href=""></a><span class="fu">glimpse</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> chr [1:3] "a" "b" "c"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href=""></a>fct_x <span class="ot">&lt;-</span> <span class="fu">factor</span>(x)</span>
-<span id="cb28-2"><a href=""></a><span class="fu">glimpse</span>(fct_x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href=""></a>fct_x <span class="ot">&lt;-</span> <span class="fu">factor</span>(x)</span>
+<span id="cb30-2"><a href=""></a><span class="fu">glimpse</span>(fct_x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Factor w/ 3 levels "a","b","c": 1 2 3</code></pre>
 </div>
@@ -947,17 +994,17 @@ COVID IgG Interp COVID IgM Interp     IgG, COVID19     IgM, COVID19
 <li>Vamos manipular os níveis de <code>analysis</code></li>
 </ul>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">|&gt;</span> </span>
-<span id="cb30-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis_f =</span> <span class="fu">factor</span>(analysis))</span>
-<span id="cb30-3"><a href=""></a><span class="fu">glimpse</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">|&gt;</span> </span>
+<span id="cb32-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis_f =</span> <span class="fu">factor</span>(analysis))</span>
+<span id="cb32-3"><a href=""></a><span class="fu">glimpse</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Factor w/ 4 levels "COVID IgG Interp",..: 4 3 3 2 4 4 2 3 4 4 ...</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href=""></a><span class="fu">levels</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href=""></a><span class="fu">levels</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "COVID IgG Interp" "COVID IgM Interp" "IgG, COVID19"     "IgM, COVID19"    </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href=""></a><span class="fu">table</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href=""></a><span class="fu">table</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 COVID IgG Interp COVID IgM Interp     IgG, COVID19     IgM, COVID19 
@@ -979,16 +1026,16 @@ COVID IgG Interp COVID IgM Interp     IgG, COVID19     IgM, COVID19
 <section id="código-para-conseguir-isto" class="slide level2">
 <h2>Código para Conseguir Isto</h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">|&gt;</span></span>
-<span id="cb36-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis_f =</span> <span class="fu">factor</span>(analysis)) <span class="sc">|&gt;</span></span>
-<span id="cb36-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis_f =</span> <span class="fu">fct_collapse</span>(analysis_f, </span>
-<span id="cb36-4"><a href=""></a>                                   <span class="at">IgG =</span> <span class="fu">c</span>(<span class="st">"COVID IgG Interp"</span>, <span class="st">"IgG, COVID19"</span>),</span>
-<span id="cb36-5"><a href=""></a>                                   <span class="at">IgM =</span> <span class="fu">c</span>(<span class="st">"COVID IgM Interp"</span>, <span class="st">"IgM, COVID19"</span>)))</span>
-<span id="cb36-6"><a href=""></a><span class="fu">glimpse</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis_f =</span> <span class="fu">factor</span>(analysis)) <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis_f =</span> <span class="fu">fct_collapse</span>(analysis_f, </span>
+<span id="cb38-4"><a href=""></a>                                   <span class="at">IgG =</span> <span class="fu">c</span>(<span class="st">"COVID IgG Interp"</span>, <span class="st">"IgG, COVID19"</span>),</span>
+<span id="cb38-5"><a href=""></a>                                   <span class="at">IgM =</span> <span class="fu">c</span>(<span class="st">"COVID IgM Interp"</span>, <span class="st">"IgM, COVID19"</span>)))</span>
+<span id="cb38-6"><a href=""></a><span class="fu">glimpse</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Factor w/ 2 levels "IgG","IgM": 2 1 1 2 2 2 2 1 2 2 ...</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href=""></a><span class="fu">fct_count</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href=""></a><span class="fu">fct_count</span>(soro_b<span class="sc">$</span>analysis_f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   f         n
@@ -1001,10 +1048,10 @@ COVID IgG Interp COVID IgM Interp     IgG, COVID19     IgM, COVID19
 <section id="forma-mais-compacta-para-obter-o-mesmo-resultado" class="slide level2">
 <h2>Forma Mais Compacta para Obter o Mesmo Resultado</h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">|&gt;</span></span>
-<span id="cb40-2"><a href=""></a><span class="fu">mutate</span>(<span class="at">analysis_f =</span> <span class="fu">fct_collapse</span>(<span class="fu">factor</span>(analysis), </span>
-<span id="cb40-3"><a href=""></a>                                 <span class="at">IgG =</span> <span class="fu">c</span>(<span class="st">"COVID IgG Interp"</span>, <span class="st">"IgG, COVID19"</span>),</span>
-<span id="cb40-4"><a href=""></a>                                 <span class="at">IgM =</span> <span class="fu">c</span>(<span class="st">"COVID IgM Interp"</span>, <span class="st">"IgM, COVID19"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">|&gt;</span></span>
+<span id="cb42-2"><a href=""></a><span class="fu">mutate</span>(<span class="at">analysis_f =</span> <span class="fu">fct_collapse</span>(<span class="fu">factor</span>(analysis), </span>
+<span id="cb42-3"><a href=""></a>                                 <span class="at">IgG =</span> <span class="fu">c</span>(<span class="st">"COVID IgG Interp"</span>, <span class="st">"IgG, COVID19"</span>),</span>
+<span id="cb42-4"><a href=""></a>                                 <span class="at">IgM =</span> <span class="fu">c</span>(<span class="st">"COVID IgM Interp"</span>, <span class="st">"IgM, COVID19"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section>
 <section>
@@ -1070,9 +1117,9 @@ soro_b$result &lt;- as.numeric(soro_b$result)
 <li>Mesma Lógica</li>
 </ul>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">%&gt;%</span> </span>
-<span id="cb43-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">result =</span> <span class="fu">as.numeric</span>(<span class="fu">ifelse</span>(result <span class="sc">==</span> <span class="st">"Não reagente"</span>, <span class="dv">0</span>, result))) </span>
-<span id="cb43-3"><a href=""></a>summarytools<span class="sc">::</span><span class="fu">dfSummary</span>(soro_b<span class="sc">$</span>result, <span class="at">graph.col =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">%&gt;%</span> </span>
+<span id="cb45-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">result =</span> <span class="fu">as.numeric</span>(<span class="fu">ifelse</span>(result <span class="sc">==</span> <span class="st">"Não reagente"</span>, <span class="dv">0</span>, result))) </span>
+<span id="cb45-3"><a href=""></a>summarytools<span class="sc">::</span><span class="fu">dfSummary</span>(soro_b<span class="sc">$</span>result, <span class="at">graph.col =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Data Frame Summary  
 soro_b  
@@ -1123,7 +1170,7 @@ No   Variable    Stats / Values         Freqs (% of Valid)   Valid     Missing
 <li><p><code>remove_constant()</code>: retira colunas que tem só 1 valor (mais NA)</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href=""></a><span class="fu">table</span>(soro<span class="sc">$</span>unit, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href=""></a><span class="fu">table</span>(soro<span class="sc">$</span>unit, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 AU/ml  &lt;NA&gt; 
@@ -1134,9 +1181,9 @@ AU/ml  &lt;NA&gt;
 <section id="retirar-unit---2" class="slide level2">
 <h2>Retirar <code>unit</code> - 2</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href=""></a>soro_b <span class="ot">&lt;-</span>  soro <span class="sc">%&gt;%</span> </span>
-<span id="cb47-2"><a href=""></a>  janitor<span class="sc">::</span><span class="fu">remove_constant</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb47-3"><a href=""></a><span class="fu">glimpse</span>(soro_b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href=""></a>soro_b <span class="ot">&lt;-</span>  soro <span class="sc">%&gt;%</span> </span>
+<span id="cb49-2"><a href=""></a>  janitor<span class="sc">::</span><span class="fu">remove_constant</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb49-3"><a href=""></a><span class="fu">glimpse</span>(soro_b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 99
 Columns: 9
@@ -1158,7 +1205,7 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
 <li><code>reference</code> só tem um valor útil: “&lt;=0.90”</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href=""></a><span class="fu">table</span>(soro<span class="sc">$</span>reference, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href=""></a><span class="fu">table</span>(soro<span class="sc">$</span>reference, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
                    &lt;=0.90 Não Reagente 
@@ -1183,10 +1230,10 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
 <section id="exemplo-simples-de-select" class="slide level2">
 <h2>Exemplo Simples de <code>select()</code></h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href=""></a>a <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>),</span>
-<span id="cb51-2"><a href=""></a>            <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
-<span id="cb51-3"><a href=""></a>            <span class="at">z =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"e"</span>, <span class="st">"f"</span>))</span>
-<span id="cb51-4"><a href=""></a>a <span class="co">#show the tibble on the screen</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href=""></a>a <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>),</span>
+<span id="cb53-2"><a href=""></a>            <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb53-3"><a href=""></a>            <span class="at">z =</span> <span class="fu">c</span>(<span class="st">"d"</span>, <span class="st">"e"</span>, <span class="st">"f"</span>))</span>
+<span id="cb53-4"><a href=""></a>a <span class="co">#show the tibble on the screen</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
   x         y z    
@@ -1195,7 +1242,7 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
 2 b         2 e    
 3 c         3 f    </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href=""></a>a <span class="sc">|&gt;</span> <span class="fu">select</span>(y) <span class="co">#just show the selected variable</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href=""></a>a <span class="sc">|&gt;</span> <span class="fu">select</span>(y) <span class="co">#just show the selected variable</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 1
       y
@@ -1209,7 +1256,7 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
 <section id="retirar-variáveis-com-select-var" class="slide level2">
 <h2>Retirar Variáveis com <code>select(-var)</code></h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href=""></a>a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href=""></a>a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
   x         y z    
@@ -1218,7 +1265,7 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
 2 b         2 e    
 3 c         3 f    </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href=""></a>a <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href=""></a>a <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 2
       y z    
@@ -1232,9 +1279,9 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
 <section id="retirar-reference-com-dplyrselect-1" class="slide level2">
 <h2>Retirar <code>reference</code> com <code>dplyr::select()</code></h2>
 <div class="cell" data-mysize="true">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">%&gt;%</span> </span>
-<span id="cb59-2"><a href=""></a>  <span class="fu">select</span>(<span class="sc">-</span>reference)</span>
-<span id="cb59-3"><a href=""></a><span class="fu">glimpse</span>(soro_b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">%&gt;%</span> </span>
+<span id="cb61-2"><a href=""></a>  <span class="fu">select</span>(<span class="sc">-</span>reference)</span>
+<span id="cb61-3"><a href=""></a><span class="fu">glimpse</span>(soro_b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 99
 Columns: 9
@@ -1256,15 +1303,15 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
 <li>Usar o <em>pipe</em>, podemos combinar todas essas operações em um comando grande</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">%&gt;%</span> </span>
-<span id="cb61-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">dt_collect =</span> <span class="fu">dmy</span>(dt_collect)) <span class="sc">%&gt;%</span> </span>
-<span id="cb61-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis =</span> <span class="fu">factor</span>(analysis)) <span class="sc">%&gt;%</span> </span>
-<span id="cb61-4"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis =</span> <span class="fu">fct_collapse</span>(analysis, </span>
-<span id="cb61-5"><a href=""></a>                                 <span class="at">IgG =</span> <span class="fu">c</span>(<span class="st">"COVID IgG Interp"</span>, <span class="st">"IgG, COVID19"</span>),</span>
-<span id="cb61-6"><a href=""></a>                                 <span class="at">IgM =</span> <span class="fu">c</span>(<span class="st">"COVID IgM Interp"</span>, <span class="st">"IgM, COVID19"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb61-7"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">result =</span> <span class="fu">as.numeric</span>(<span class="fu">ifelse</span>(result <span class="sc">==</span> <span class="st">"Não reagente"</span>, <span class="dv">0</span>, result))) <span class="sc">%&gt;%</span> </span>
-<span id="cb61-8"><a href=""></a>  janitor<span class="sc">::</span><span class="fu">remove_constant</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span>  <span class="co"># unit variable</span></span>
-<span id="cb61-9"><a href=""></a>  <span class="fu">select</span>(<span class="sc">-</span>reference)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href=""></a>soro_b <span class="ot">&lt;-</span> soro <span class="sc">%&gt;%</span> </span>
+<span id="cb63-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">dt_collect =</span> <span class="fu">dmy</span>(dt_collect)) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-3"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis =</span> <span class="fu">factor</span>(analysis)) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-4"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">analysis =</span> <span class="fu">fct_collapse</span>(analysis, </span>
+<span id="cb63-5"><a href=""></a>                                 <span class="at">IgG =</span> <span class="fu">c</span>(<span class="st">"COVID IgG Interp"</span>, <span class="st">"IgG, COVID19"</span>),</span>
+<span id="cb63-6"><a href=""></a>                                 <span class="at">IgM =</span> <span class="fu">c</span>(<span class="st">"COVID IgM Interp"</span>, <span class="st">"IgM, COVID19"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb63-7"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">result =</span> <span class="fu">as.numeric</span>(<span class="fu">ifelse</span>(result <span class="sc">==</span> <span class="st">"Não reagente"</span>, <span class="dv">0</span>, result))) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-8"><a href=""></a>  janitor<span class="sc">::</span><span class="fu">remove_constant</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span>  <span class="co"># unit variable</span></span>
+<span id="cb63-9"><a href=""></a>  <span class="fu">select</span>(<span class="sc">-</span>reference)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="resultado-final-de-munging" class="slide level2">
@@ -1286,6 +1333,342 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
 </section></section>
 <section id="soro_b-segue-a-definição-de-tidy" class="title-slide slide level1 center" data-background-color="blue">
 <h1><code>soro_b</code> Segue a Definição de “<em>Tidy</em>”?</h1>
+
+</section>
+
+<section id="mais-duas-funções-importantes-de-data-munging" class="title-slide slide level1 center" data-background-color="blue">
+<h1>Mais Duas Funções Importantes de “Data Munging”</h1>
+
+</section>
+
+<section>
+<section id="dados-extensos-wide-vs.-profundos-long" class="title-slide slide level1 center" data-background-color="darkgreen">
+<h1>Dados Extensos (<em>Wide</em>) vs.&nbsp;Profundos (<em>Long</em>)</h1>
+
+</section>
+<section id="este-quer-dizer" class="slide level2">
+<h2>Este Quer Dizer</h2>
+<ul>
+<li>Planilhas normalmente apresentam dados no formato <strong>extenso</strong>
+<ul>
+<li>Cada caso tem um número de variáveis</li>
+</ul></li>
+<li>Para algumas análises, precisamos combinar algumas das variáveis
+<ul>
+<li>Esta operação faz o formato <strong>profundo</strong></li>
+</ul></li>
+</ul>
+</section>
+<section id="dados-de-exemplo" class="slide level2">
+<h2>Dados de Exemplo</h2>
+<ul>
+<li>Vem das bases de dados do Estado de São Paulo (SEADE) sobre COVID-19
+<ul>
+<li>Uma tabela de comorbidades</li>
+</ul></li>
+<li>Conjunto randomizado de 300 casos dos dados demográficos e de comorbidades</li>
+<li>Conjunto já <em>tidy</em></li>
+</ul>
+</section>
+<section id="dados" class="slide level2 smaller">
+<h2>Dados</h2>
+<div class="cell" data-mysize="true">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href=""></a>sp_comorb <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"seade_comorb_sample.rds"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb65-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">pacid =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(.), <span class="at">.before =</span> <span class="dv">1</span>) <span class="co"># add pacid to make what is happening clearer</span></span>
+<span id="cb65-3"><a href=""></a><span class="fu">glimpse</span>(<span class="fu">head</span>(sp_comorb))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 6
+Columns: 10
+$ pacid       &lt;int&gt; 1, 2, 3, 4, 5, 6
+$ city        &lt;chr&gt; "Itaquaquecetuba", "Sorocaba", "Sao Paulo", "Sao Paulo", "…
+$ age         &lt;dbl&gt; 58, 62, 78, 65, 59, 68
+$ sex         &lt;fct&gt; male, male, female, female, male, female
+$ death       &lt;lgl&gt; FALSE, TRUE, FALSE, FALSE, FALSE, FALSE
+$ cardiopathy &lt;fct&gt; true, true, true, true, false, true
+$ diabetes    &lt;fct&gt; true, NA, true, true, true, NA
+$ obesity     &lt;fct&gt; false, NA, NA, NA, false, true
+$ neuro       &lt;fct&gt; false, NA, NA, NA, false, NA
+$ kidney      &lt;fct&gt; false, NA, true, NA, false, NA</code></pre>
+</div>
+</div>
+</section>
+<section id="mudar-formato-para-análise-desejada" class="slide level2 smaller">
+<h2>Mudar Formato para Análise Desejada</h2>
+<ul>
+<li>Para a análise atual, queremos estudar comorbidades como um grupo
+<ul>
+<li>Não como as condições dos indivíduos</li>
+</ul></li>
+<li>Neste caso …
+<ul>
+<li>Cada comorbidade não é uma variável em si
+<ul>
+<li>São <strong>valores</strong> de 2 novas variáveis</li>
+<li><code>comorbid</code>: o nome da comorbidade (a chave - <em>key</em>)</li>
+<li><code>value</code>: presença ou ausência da condição (o valor - <em>value</em>)</li>
+</ul></li>
+</ul></li>
+<li>Par <em>key:value</em></li>
+</ul>
+</section>
+<section id="função-tidyrpivot_longer" class="slide level2">
+<h2>Função <code>tidyr::pivot_longer()</code></h2>
+<ul>
+<li><code>cols =</code> colunas que seriam combinados em pares <strong><em>key:value</em></strong></li>
+<li><code>names_to =</code> o nome da variável que vai conter as chaves</li>
+<li><code>values_to =</code> o nome da variável que vai conter os valores</li>
+</ul>
+</section>
+<section id="novo-tibble-long" class="slide level2">
+<h2>Novo Tibble <em>Long</em></h2>
+<div class="cell" data-mysize="true">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href=""></a>sp_comorb_long <span class="ot">&lt;-</span> sp_comorb <span class="sc">%&gt;%</span> </span>
+<span id="cb67-2"><a href=""></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> cardiopathy<span class="sc">:</span>kidney, <span class="at">names_to =</span> <span class="st">"comorbid"</span>,</span>
+<span id="cb67-3"><a href=""></a>               <span class="at">values_to =</span> <span class="st">"value"</span>)</span>
+<span id="cb67-4"><a href=""></a><span class="fu">glimpse</span>(<span class="fu">head</span>(sp_comorb_long))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 6
+Columns: 7
+$ pacid    &lt;int&gt; 1, 1, 1, 1, 1, 2
+$ city     &lt;chr&gt; "Itaquaquecetuba", "Itaquaquecetuba", "Itaquaquecetuba", "Ita…
+$ age      &lt;dbl&gt; 58, 58, 58, 58, 58, 62
+$ sex      &lt;fct&gt; male, male, male, male, male, male
+$ death    &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, TRUE
+$ comorbid &lt;chr&gt; "cardiopathy", "diabetes", "obesity", "neuro", "kidney", "car…
+$ value    &lt;fct&gt; true, true, false, false, false, true</code></pre>
+</div>
+</div>
+</section>
+<section id="sp_comorb_long-sobre-comorbidades---sim" class="slide level2">
+<h2><code>sp_comorb_long</code> sobre Comorbidades - Sim</h2>
+<ul>
+<li><p>Pacientes não um unidade básica deste formato</p>
+<ul>
+<li>Cada <code>pacid</code> aparece 5 vezes</li>
+<li>1 para cada comorbidade</li>
+</ul>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 7
+  pacid city              age sex   death comorbid    value
+  &lt;int&gt; &lt;chr&gt;           &lt;dbl&gt; &lt;fct&gt; &lt;lgl&gt; &lt;chr&gt;       &lt;fct&gt;
+1     1 Itaquaquecetuba    58 male  FALSE cardiopathy true 
+2     1 Itaquaquecetuba    58 male  FALSE diabetes    true 
+3     1 Itaquaquecetuba    58 male  FALSE obesity     false</code></pre>
+</div>
+</div></li>
+</ul>
+</section>
+<section id="pode-inverter-o-processo-long-a-wide" class="slide level2">
+<h2>Pode Inverter o Processo <em>Long</em> a <em>Wide</em></h2>
+<ul>
+<li><code>tidyr::pivot_wider()</code></li>
+<li>Valores de variável <em>key</em> tornam nomes das variáveis no formato <em>wide</em></li>
+<li>Valores de variável <em>value</em> tornam valores desses novas variáveis</li>
+</ul>
+</section>
+<section id="exemplo-da-inversão" class="slide level2">
+<h2>Exemplo da Inversão</h2>
+<div class="cell" data-mysize="true">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href=""></a>sp_comorb_wide <span class="ot">&lt;-</span> sp_comorb_long <span class="sc">%&gt;%</span> </span>
+<span id="cb70-2"><a href=""></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">"comorbid"</span>,</span>
+<span id="cb70-3"><a href=""></a>              <span class="at">values_from =</span> <span class="st">"value"</span>)</span>
+<span id="cb70-4"><a href=""></a><span class="fu">glimpse</span>(<span class="fu">head</span>(sp_comorb_wide))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 6
+Columns: 10
+$ pacid       &lt;int&gt; 1, 2, 3, 4, 5, 6
+$ city        &lt;chr&gt; "Itaquaquecetuba", "Sorocaba", "Sao Paulo", "Sao Paulo", "…
+$ age         &lt;dbl&gt; 58, 62, 78, 65, 59, 68
+$ sex         &lt;fct&gt; male, male, female, female, male, female
+$ death       &lt;lgl&gt; FALSE, TRUE, FALSE, FALSE, FALSE, FALSE
+$ cardiopathy &lt;fct&gt; true, true, true, true, false, true
+$ diabetes    &lt;fct&gt; true, NA, true, true, true, NA
+$ obesity     &lt;fct&gt; false, NA, NA, NA, false, true
+$ neuro       &lt;fct&gt; false, NA, NA, NA, false, NA
+$ kidney      &lt;fct&gt; false, NA, true, NA, false, NA</code></pre>
+</div>
+</div>
+</section>
+<section id="vantagens-e-desvantagens-de-formato-longo" class="slide level2">
+<h2>Vantagens e Desvantagens de Formato Longo</h2>
+<ul>
+<li><p>Facilita análises e gráficos detalhadas</p></li>
+<li><p>Permite manipulação dos dados mais fácilmente</p></li>
+<li><p>MAS, format largo mais fácil de ler e entender</p></li>
+</ul>
+</section></section>
+<section>
+<section id="juntar-dados-de-tibbles-diferentes" class="title-slide slide level1 center" data-background-color="green">
+<h1>Juntar Dados de <em>Tibbles</em> Diferentes</h1>
+<ul>
+<li>Dados para uma análise podem estar gravados em mais que uma tabela</li>
+<li>Especialmente quando está trabalando com ly true for data from <em>bancos de dados relacionais</em> como SQL</li>
+<li><code>join...</code> funções para integrar <em>data frames</em> baseados em chaves comuns</li>
+</ul>
+</section>
+<section id="dados-para-joins" class="slide level2">
+<h2>Dados para <em>Joins</em></h2>
+<ul>
+<li>Dados sobre voos saindo de qualquer um does 3 aeroportos de NY em 2013
+<ul>
+<li>Pacote <code>nycflights13</code></li>
+<li>Tabelas para
+<ul>
+<li>Nomes das linhas aereas que servem os aeroportos</li>
+<li>Aeroportos de destino de voo</li>
+<li>Aviões - modelos e número de cauda</li>
+<li>Tempo nos aeroportos</li>
+<li>Voos - componente central do sistema</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="section" class="slide level2">
+<h2></h2>
+
+<img data-src="../images/flights_str.png" class="quarto-figure quarto-figure-center r-stretch" style="width:90.0%"></section>
+<section id="escolhe-amostra-de-10-voos" class="slide level2 smaller">
+<h2>Escolhe Amostra de 10 Voos</h2>
+<div class="cell" data-mysize="true">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href=""></a><span class="fu">library</span>(nycflights13)</span>
+<span id="cb72-2"><a href=""></a><span class="fu">data</span>(flights)</span>
+<span id="cb72-3"><a href=""></a><span class="co"># select a set of 10 flights</span></span>
+<span id="cb72-4"><a href=""></a>flights <span class="ot">&lt;-</span> flights <span class="sc">%&gt;%</span> </span>
+<span id="cb72-5"><a href=""></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb72-6"><a href=""></a>  <span class="fu">select</span>(year<span class="sc">:</span>day, flight, origin, dest, carrier) <span class="co"># select subset of vars</span></span>
+<span id="cb72-7"><a href=""></a>flights</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 7
+    year month   day flight origin dest  carrier
+   &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  
+ 1  2013     9     2   3565 LGA    CLT   MQ     
+ 2  2013     9     8   1511 EWR    RSW   B6     
+ 3  2013    10    16    256 EWR    PDX   UA     
+ 4  2013     4     4   1031 LGA    DTW   DL     
+ 5  2013     8    23   3310 JFK    MCI   9E     
+ 6  2013     3    24    443 JFK    MIA   AA     
+ 7  2013     8    11    807 EWR    ATL   DL     
+ 8  2013    12    17   4179 EWR    PWM   EV     
+ 9  2013     8     9   1101 JFK    FLL   B6     
+10  2013     1    13    537 EWR    TPA   B6     </code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Linhas aéreas só tem ID de 2 letras, não o nome completo.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="nomes-completos-ficam-em-airlines" class="slide level2">
+<h2>Nomes Completos Ficam em <code>airlines</code></h2>
+<ul>
+<li>Data frame diferente</li>
+</ul>
+<div class="cell" data-mysize="true">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href=""></a><span class="co"># load the airlines list</span></span>
+<span id="cb74-2"><a href=""></a><span class="fu">data</span>(airlines)</span>
+<span id="cb74-3"><a href=""></a><span class="fu">head</span>(airlines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  carrier name                    
+  &lt;chr&gt;   &lt;chr&gt;                   
+1 9E      Endeavor Air Inc.       
+2 AA      American Airlines Inc.  
+3 AS      Alaska Airlines Inc.    
+4 B6      JetBlue Airways         
+5 DL      Delta Air Lines Inc.    
+6 EV      ExpressJet Airlines Inc.</code></pre>
+</div>
+</div>
+</section>
+<section id="juntar-nome-de-linha-aos-voos" class="slide level2">
+<h2>Juntar Nome de Linha aos Voos</h2>
+<ul>
+<li>As 2 tabelas têm variável <code>carrier</code>
+<ul>
+<li><code>carrier</code> - código de 2 digitos</li>
+</ul></li>
+<li><code>left_join()</code>
+<ul>
+<li>Juntar os dados da tabela da RHS para os dados no LHS</li>
+<li>Usando variáveis em comum</li>
+<li>Somente mostra colunas relacionados ao problema atual</li>
+</ul></li>
+</ul>
+</section>
+<section id="section-1" class="slide level2">
+<h2></h2>
+<div class="cell" data-mysize="true">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href=""></a><span class="co"># join the airline names to the flights</span></span>
+<span id="cb76-2"><a href=""></a>flights_mod <span class="ot">&lt;-</span> flights <span class="sc">%&gt;%</span> </span>
+<span id="cb76-3"><a href=""></a>  <span class="fu">left_join</span>(airlines, <span class="at">by =</span> <span class="st">"carrier"</span>)</span>
+<span id="cb76-4"><a href=""></a>flights_mod[, <span class="dv">4</span><span class="sc">:</span><span class="dv">8</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+   flight origin dest  carrier name                    
+    &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;                   
+ 1   3565 LGA    CLT   MQ      Envoy Air               
+ 2   1511 EWR    RSW   B6      JetBlue Airways         
+ 3    256 EWR    PDX   UA      United Air Lines Inc.   
+ 4   1031 LGA    DTW   DL      Delta Air Lines Inc.    
+ 5   3310 JFK    MCI   9E      Endeavor Air Inc.       
+ 6    443 JFK    MIA   AA      American Airlines Inc.  
+ 7    807 EWR    ATL   DL      Delta Air Lines Inc.    
+ 8   4179 EWR    PWM   EV      ExpressJet Airlines Inc.
+ 9   1101 JFK    FLL   B6      JetBlue Airways         
+10    537 EWR    TPA   B6      JetBlue Airways         </code></pre>
+</div>
+</div>
+</section>
+<section id="tipos-de-joins" class="slide level2 smaller">
+<h2>Tipos de <em>Joins</em></h2>
+<ul>
+<li><em>Joins</em> de mutação como <code>left_join</code>
+<ul>
+<li>Mudar a <em>data frame</em> do lado esquerdo
+<ul>
+<li>Pode até tirar fileiras do <em>data frame</em> do lado esquerdo</li>
+</ul></li>
+<li>Usar dados do <em>data frame</em> do lado direto</li>
+<li>Mas não mudar o data frame do lado direto</li>
+</ul></li>
+<li>Outros <em>joins</em> de mutação
+<ul>
+<li><code>right_join()</code>
+<ul>
+<li>Inversão dos papeis dos <em>data frames</em> do esquerdo e direto</li>
+</ul></li>
+<li><code>full_join()</code>
+<ul>
+<li>Mantem todos as fileiras no lado esquerdo se existe a chave correspondente certa ou não</li>
+</ul></li>
+<li><code>inner_join()</code> Somente mantem as fileiras com valor de chave nos dois lados</li>
+</ul></li>
+</ul>
+</section>
+<section id="vss-chaves-em-joins" class="slide level2">
+<h2>VSS: Chaves em <em>Joins</em></h2>
+<ul>
+<li>Se as chaves dos lados esquerdo e direto têm nomes, precisa usar um <code>by =</code> diferente</li>
+<li>Caso que tem nome da chave = <code>a</code> no esquerdo e <code>b</code> no direto</li>
+<li><code>by = c("a" = "b")</code>
+<ul>
+<li>Uso da função <code>c()</code></li>
+<li>Uso das aspas</li>
+</ul></li>
+</ul>
+</section></section>
+<section id="agora-sabe-manipular-os-dados-em-r" class="title-slide slide level1 center" data-background-color="blue">
+<h1>Agora, Sabe Manipular os Dados em R</h1>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
@@ -1296,19 +1679,19 @@ $ city       &lt;chr&gt; "SAO PAULO", NA, "SAO PAULO", "SAO PAULO", "SAO PAULO",
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="r_class2_munge_24_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="r_class2_munge_24_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="r_class2_munge_24b_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>

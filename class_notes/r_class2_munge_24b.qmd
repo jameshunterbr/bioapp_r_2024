@@ -3,11 +3,11 @@ title: "Análise dos Dados com R"
 subtitle: "Data Munging e o Tidyverse"
 author: "James R. Hunter, PhD"
 institute: "Retrovirologia, EPM, UNIFESP"
-date: "2023-10-03"
+date: "2024-11-05"
 format:
   revealjs:
     theme: serif
-    logo: epm_logo.png
+#    logo: epm_logo.png
     slide-number: c/t
 editor: visual
 ---
@@ -25,10 +25,10 @@ knitr::opts_chunk$set(
   hiline = TRUE
 )
 pacman::p_load(tidyverse, here, summarytools, janitor, knitr)
-gr <- here::here("graphics")
+gr <- here::here("images")
 ```
 
-# Tidy Data {background-color="blue" background-image="graphics/dplyr_wrangling.png"}
+# Tidy Data {background-color="blue"}
 
 ## Resumo de um *Data Frame*/*Tibble*
 
@@ -117,34 +117,38 @@ dfSummary(soro[,5:7], graph.col = FALSE)
 
 ```
 
-## Variável *birth_yr* {.smaller}
+## Funcão Alternativa {.smaller}
 
-```{r dfsumm6, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
+-   Função `skimr::skim`
 
-dfSummary(soro$birth_yr, graph.col = FALSE)
+    -   Alternativa: `skimr::skim_without_charts()`
+
+    -   All results in tibbles
+
+    -   Charts are mini-histograms
+
+```{r skimer, eval = FALSE}
+skimx <- skimr::skim_without_charts(soro)
 
 ```
 
-## Variável *uf*
+## Tibble of Result
 
-```{r dfsumm7, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
-
-dfSummary(soro$uf, graph.col = FALSE)
-
+```{r  print_skimmer, echo = FALSE}
+skimx <- skimr::skim_without_charts(soro)
+skimx |> 
+  select(skim_variable, n_missing, complete_rate, character.n_unique, numeric.mean)
 ```
 
-## Variável *city*
-
-```{r dfsumm8, message = FALSE, warning = FALSE, echo = FALSE, eval = TRUE, mysize=TRUE, size='\\tiny'}
-
-dfSummary(soro$city, graph.col = FALSE)
-```
+::: callout-note
+Não como aparece; tem mais variáveis e formatação
+:::
 
 # Munging Este Conjunto dos Dados {background-color="blue"}
 
 ## Tasks {.smaller}
 
--   `dt_collect`: formato não padronizado, caractere
+-   `dt_collect`: formato não padronizado, carâter
     -   Transformar para Date com funções do pacote `lubridate`
 -   `analysis`: tem maneiras diferentes para designar o mesmo teste
     -   Pode isolar o nome de anticorpo com as funções de `stringr`
@@ -197,7 +201,7 @@ names(test_df) <- c("first_name", "last_name",
                   "value_1", "value_2", "standard")
 ```
 
-# *Munging* as Variáveis {background-color="blue"}
+# *Munging* Variáveis {background-color="blue"}
 
 ## Traduzir Datas do Formato Texto a *Date*
 
@@ -242,8 +246,8 @@ us_text <- "05-28-2020"
 -   Sequência das ações:
 
     -   Começa com `x` então
-    -   Use `x` como uma entrada para a função `f()` então
-    -   Use o resultado da `f(x)` como uma entrada para a função `g()` então
+    -   Use `x` como uma entrada para a função `f()` depois
+    -   Use o resultado da `f(x)` como uma entrada para a função `g()` depois
     -   Use o resultado da `g(f(x))` como uma entrada para a função `h()`
 
 -   Solução de parênteses aninhados
@@ -254,7 +258,7 @@ us_text <- "05-28-2020"
 
 ## Operador *Pipe* (\|\>)
 
--   Pega o que está no lado esquerdo do operador
+-   O que fica no lado esquerdo do operador
 
 -   Ele torna primeiro argumento da função no lado direto
 
@@ -271,11 +275,11 @@ x |>
   h()
 ```
 
-1.  Pega `x` e então
+1.  Pega `x` e depois
 
-2.  Use este resultado como a entrada para próxima função `f()` e então
+2.  Use este resultado como a entrada para próxima função `f()` e depois
 
-3.  Use este resultado como a entrada para próxima função `g()` e então
+3.  Use este resultado como a entrada para próxima função `g()` e depois
 
 4.  Use este resultado como a entrada para próxima função `h()`
 
@@ -292,7 +296,7 @@ x |>
 
 -   Nome de variável no lado esquerdo
 
--   Se este nome de variável não existe no *tibble*, If variable name does not exist in tibble, ele será adicionado
+-   Se este nome de variável não existe no *tibble*, ele será adicionado
 
 -   Se variável existente, substuir o valor atual
 
@@ -302,7 +306,7 @@ x |>
 
 ```{r mut_funcs, echo = FALSE, fig.align='center', out.width = "20%"}
 
-knitr::include_graphics(glue::glue(gr, '/mutate_funcs.png'))
+knitr::include_graphics(here(gr, 'mutate_funcs.png'))
 ```
 
 ## Modificar *dt_collect* com `mutate()`
@@ -407,7 +411,7 @@ table(soro_b$analysis_f)
 
 ```
 
-## *fct_collapse()* Aplicado a `analysis` 
+## *fct_collapse()* Aplicado a `analysis`
 
 -   `forcats::fct_collapse()`: reduzir o número de níveis baseado em valores da variável
 
@@ -417,7 +421,7 @@ table(soro_b$analysis_f)
 
     -   Precisa definir cada um separadamenteNeed to define each separately
 
-## Code for This
+## Código para Conseguir Isto
 
 ```{r fct_coll, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
 
@@ -489,25 +493,25 @@ summarytools::dfSummary(soro_b$result, graph.col = FALSE)
 
 ```
 
-# New Problem with *result()* {.smaller}
+# Problema Nova com *result* {.smaller}
 
--   What is that 30.8 Value?
+-   O que é aquele valor 30.8 ?
 
--   Mean = 1.7
+-   Média = 1.7
 
--   Value is `r round((30.8 - 1.7)/5.5, 2)` standard deviations outside mean
+-   Valor é `r round((30.8 - 1.7)/5.5, 2)` desvios padrão fora da média
 
--   Reference value from `reference` is "\<=0.90"
+-   O valor de referência da `reference` é "\<=0.90"
 
-    -   This value 30 times higher than reference
+    -   Este valor fica 30 x mais alto que a referência
 
 -   **Outlier**
 
--   Important Issue in statistics
+-   Problema importante na estatística
 
--   Lesson: Take careful note of range of numerical values
+-   Fique bem atento ao intervalo dos valores númericos
 
-    -   Problem to be solved during analysis phase
+    -   Problema a ser resolvido durante a fase de análise
 
 # Retirar Variáveis Desnecessárias {background-color="blue"}
 
@@ -565,7 +569,7 @@ table(soro$reference, useNA = "ifany")
 
     -   `select()` elas negativamente em argumentos
 
-## Exemplo Simples de `select()` 
+## Exemplo Simples de `select()`
 
 ```{r ex_select, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
 
@@ -594,14 +598,6 @@ soro_b <- soro %>%
 glimpse(soro_b)
 ```
 
-## Transformar `uf` para um `factor`
-
-```{r}
-soro_b <- soro %>% 
-  mutate(uf = factor(uf))
-glimpse(soro_b$uf)
-```
-
 ## Combinar Todas as Ops com o *Pipe*
 
 -   Usar o *pipe*, podemos combinar todas essas operações em um comando grande
@@ -616,8 +612,7 @@ soro_b <- soro %>%
                                  IgM = c("COVID IgM Interp", "IgM, COVID19"))) %>%
   mutate(result = as.numeric(ifelse(result == "Não reagente", 0, result))) %>% 
   janitor::remove_constant(na.rm = TRUE) %>%  # unit variable
-  select(-reference) %>% 
-  mutate(uf = factor(uf))
+  select(-reference)
 ```
 
 ## Resultado Final de *Munging*
@@ -627,3 +622,183 @@ glimpse(soro_b)
 ```
 
 # `soro_b` Segue a Definição de "*Tidy*"? {background-color="blue"}
+
+# Mais Duas Funções Importantes de "Data Munging" {background-color="blue"}
+
+# Dados Extensos (*Wide*) vs. Profundos (*Long*) {background-color="darkgreen"}
+
+## Este Quer Dizer
+
+-   Planilhas normalmente apresentam dados no formato **extenso**
+    -   Cada caso tem um número de variáveis
+-   Para algumas análises, precisamos combinar algumas das variáveis
+    -   Esta operação faz o formato **profundo**
+
+## Dados de Exemplo
+
+-   Vem das bases de dados do Estado de São Paulo (SEADE) sobre COVID-19
+    -   Uma tabela de comorbidades
+-   Conjunto randomizado de 300 casos dos dados demográficos e de comorbidades
+-   Conjunto já *tidy*
+
+## Dados {.smaller}
+
+```{r load_seade, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+sp_comorb <- readRDS(here("seade_comorb_sample.rds")) %>% 
+  mutate(pacid = 1:nrow(.), .before = 1) # add pacid to make what is happening clearer
+glimpse(head(sp_comorb))
+
+```
+
+## Mudar Formato para Análise Desejada {.smaller}
+
+-   Para a análise atual, queremos estudar comorbidades como um grupo
+    -   Não como as condições dos indivíduos
+-   Neste caso ...
+    -   Cada comorbidade não é uma variável em si
+        -   São **valores** de 2 novas variáveis
+        -   `comorbid`: o nome da comorbidade (a chave - *key*)
+        -   `value`: presença ou ausência da condição (o valor - *value*)
+-   Par *key:value*
+
+## Função `tidyr::pivot_longer()`
+
+-   `cols =` colunas que seriam combinados em pares ***key:value***
+-   `names_to =` o nome da variável que vai conter as chaves
+-   `values_to =` o nome da variável que vai conter os valores
+
+## Novo Tibble *Long*
+
+```{r piv_comorb, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+sp_comorb_long <- sp_comorb %>% 
+  pivot_longer(cols = cardiopathy:kidney, names_to = "comorbid",
+               values_to = "value")
+glimpse(head(sp_comorb_long))
+```
+
+## `sp_comorb_long` sobre Comorbidades - Sim
+
+-   Pacientes não um unidade básica deste formato
+
+    -   Cada `pacid` aparece 5 vezes
+    -   1 para cada comorbidade
+
+    ```{r echo = FALSE}
+
+    head(sp_comorb_long, 3)
+    ```
+
+## Pode Inverter o Processo *Long* a *Wide*
+
+-   `tidyr::pivot_wider()`
+-   Valores de variável *key* tornam nomes das variáveis no formato *wide*
+-   Valores de variável *value* tornam valores desses novas variáveis
+
+## Exemplo da Inversão
+
+```{r piv_back, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+sp_comorb_wide <- sp_comorb_long %>% 
+  pivot_wider(names_from = "comorbid",
+              values_from = "value")
+glimpse(head(sp_comorb_wide))
+```
+
+## Vantagens e Desvantagens de Formato Longo
+
+-   Facilita análises e gráficos detalhadas
+
+-   Permite manipulação dos dados mais fácilmente
+
+-   MAS, format largo mais fácil de ler e entender
+
+# Juntar Dados de *Tibbles* Diferentes {background-color="green"}
+
+-   Dados para uma análise podem estar gravados em mais que uma tabela
+-   Especialmente quando está trabalando com ly true for data from *bancos de dados relacionais* como SQL
+-   `join...` funções para integrar *data frames* baseados em chaves comuns
+
+## Dados para *Joins*
+
+-   Dados sobre voos saindo de qualquer um does 3 aeroportos de NY em 2013
+    -   Pacote `nycflights13`
+    -   Tabelas para
+        -   Nomes das linhas aereas que servem os aeroportos
+        -   Aeroportos de destino de voo
+        -   Aviões - modelos e número de cauda
+        -   Tempo nos aeroportos
+        -   Voos - componente central do sistema
+
+## 
+
+```{r df_flights1, echo = FALSE, fig.align='center',  out.width = "90%"}
+
+knitr::include_graphics(here('images', 'flights_str.png'))
+```
+
+## Escolhe Amostra de 10 Voos {.smaller}
+
+```{r flights1, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+library(nycflights13)
+data(flights)
+# select a set of 10 flights
+flights <- flights %>% 
+  slice_sample(n = 10) %>% 
+  select(year:day, flight, origin, dest, carrier) # select subset of vars
+flights
+```
+
+::: callout-note
+Linhas aéreas só tem ID de 2 letras, não o nome completo.
+:::
+
+## Nomes Completos Ficam em `airlines`
+
+-   Data frame diferente
+
+```{r flights2, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+# load the airlines list
+data(airlines)
+head(airlines)
+```
+
+## Juntar Nome de Linha aos Voos
+
+-   As 2 tabelas têm variável `carrier`
+    -   `carrier` - código de 2 digitos
+-   `left_join()`
+    -   Juntar os dados da tabela da RHS para os dados no LHS
+    -   Usando variáveis em comum
+    -   Somente mostra colunas relacionados ao problema atual
+
+## 
+
+```{r flights3, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+# join the airline names to the flights
+flights_mod <- flights %>% 
+  left_join(airlines, by = "carrier")
+flights_mod[, 4:8]
+```
+
+## Tipos de *Joins* {.smaller}
+
+-   *Joins* de mutação como `left_join`
+    -   Mudar a *data frame* do lado esquerdo
+        -   Pode até tirar fileiras do *data frame* do lado esquerdo
+    -   Usar dados do *data frame* do lado direto
+    -   Mas não mudar o data frame do lado direto
+-   Outros *joins* de mutação
+    -   `right_join()`
+        -   Inversão dos papeis dos *data frames* do esquerdo e direto
+    -   `full_join()`
+        -   Mantem todos as fileiras no lado esquerdo se existe a chave correspondente certa ou não
+    -   `inner_join()` Somente mantem as fileiras com valor de chave nos dois lados
+
+## VSS: Chaves em *Joins*
+
+-   Se as chaves dos lados esquerdo e direto têm nomes, precisa usar um `by =` diferente
+-   Caso que tem nome da chave = `a` no esquerdo e `b` no direto
+-   `by = c("a" = "b")`
+    -   Uso da função `c()`
+    -   Uso das aspas
+
+# Agora, Sabe Manipular os Dados em R {background-color="blue"}
