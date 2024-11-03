@@ -1,0 +1,762 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Visualização dos Dados e EDA"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-11-19"
+format:
+  revealjs:
+    theme: sky
+    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, summarytools, janitor, knitr, ggsci)
+gr <- here("images")
+```
+
+# Visualização dos Dados {background-color="blue" background-image="graphics/computer graphcarlos-muza.jpg"}
+
+## Florence Nightingale - Diagramma de Rosa
+
+-   Demonstrou claramente as causas de mortalidade entre soldados ingleses na guerra de Crimeia
+
+-   Gráfico hoje conhecido como "*polar axis histogram*"
+
+```{r nightingale, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here('images', 'nightingale_rose_histo.png'))
+
+```
+
+## Charles Minard - Diagrama de Fluxo do Exército de Napoleão
+
+-   Publicado em 1869
+
+-   Diagrama "Sankey" de fluxos
+
+```{r minard, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here('images', 'Minard.png'))
+
+```
+
+## Mapa de Cólera no Soho de Londres
+
+-   Bomba de agua de Broad Street
+
+-   Mapa de John Snow definitivamente mostrou que este surto de cólera veio da agua infectada desta bomba.
+
+```{r broad_st, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here('images', 'snow_map_soho.png'))
+
+```
+
+## John Tukey on Visualization
+
+> The simple graph has brought more information to the data analyst's mind than any other device.
+
+> O gráfico simples trouxe mais informações à mente do analista dos dados do que qualquer outro dispositivo.
+
+***Tópico de suprema importância***
+
+# Análise Exploratório dos Dados {background-color="blue"}
+
+## Exploração Inicial dos Dados
+
+-   Onde queremos tentamos achar o que os dados estão dizendo
+-   Principal uso de visualizações
+-   Série de medidas e gráficos que mostram as variáveis
+-   Exploração das variáveis
+    -   Uma por vez (univariada)
+    -   Tabulações cruzadas de conjuntos de variáveis
+-   Sempre procurando valores de dados estranhos
+
+## Dados: `fute_mod.rds` {.smaller}
+
+-   Conjunto dos dados sobre lesões relacionadas ao futebol nos EUA
+
+```{r load_fm, echo = TRUE, mysize=TRUE, size='\\scriptsize'}
+
+fm <- readRDS(here("fute_mod_2020.rds")) %>% 
+  mutate(age_grp = factor(case_when(
+    age < 18 ~ "youth", 
+    age < 60 ~ "adult",
+    TRUE ~ "elderly"
+  ))) %>% 
+# use relevel to change order of levels
+  mutate(age_grp = fct_relevel(age_grp, c("youth", "adult", "elderly")))
+glimpse(head(fm))
+```
+
+## Variável `age`
+
+```{r look_age, echo = TRUE, message = F, warning = F, mysize=TRUE, size='\\tiny'}
+summarytools::descr(fm$age, stats = "common")
+```
+
+## Min = 0.00 ?
+
+```{r fute_mod2, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here('images', 'Inkedfute_age_mod_LI.jpg'))
+```
+
+## Quem É Essa Pessoa com `age` = 0?
+
+-   `r fm$narrative[fm$case_num == '170101489']`
+-   Não é um bebezinho; pessoa de idade desconhecida
+-   Mudar `age` = 0 para `NA`
+-   Existem outros casos com `age` = 0 ou próximo?
+
+## Quantos Casos Têm Idade Menos de 5 Anos
+
+-   Idade em que crianças começam escola
+
+```{r kids, echo = TRUE, message = F, warning = F, mysize=TRUE, size='\\scriptsize'}
+fm %>% 
+  filter(age < 5) %>% 
+  summarise(n = n())
+
+```
+
+# Medidas de Tendência Central {background-color="blue"}
+
+## Interesse em Pessoas que Jogam Futebol {.smaller}
+
+-   Quais tipos de lesões sofrem **amadores** jogando futebol
+-   Eliminar casos com idades menos de 5 anos
+
+```{r elim_kids, echo = TRUE, message = F, warning = F, mysize=TRUE, size='\\scriptsize'}
+
+fm_mk2 <- fm %>% 
+  filter(age >= 5)
+summarytools::descr(fm_mk2$age, stats = "common")
+```
+
+## Médias de Duas Distribuições
+
+-   Média de `fm` (com pequenas crianças): `r mean(fm$age)`
+
+-   `Média de fm_mk2` (sem pequenas crianças): `r mean(fm_mk2$age)`
+
+-   Se removêssemos 82 casos, porque a diferença não é maior?
+
+## O Que É a Média?
+
+-   Um das medidas de **tendência central**
+    -   Valores que ficam no meio da distribuição
+    -   Valores populares
+-   O **centro aritmético** de uma distribuição
+-   Sensível aos valores extremos
+
+## Visualização Clássica de uma Distribuição - Histograma
+
+```{r hist_bas, echo = TRUE, message = F, warning = F}
+hist(fm_mk2$age)
+
+```
+
+## Histograma Foi Útil?
+
+-   Não deu muita informação
+-   Problema de `bins`
+-   Apresentação muito feia
+
+# Sistema Gráfico Alternativo {background-color="blue"}
+
+## *Grammar of Graphics* - `ggplot2` {.smaller}
+
+-   Um sistema para **construir** gráficos (que se comunicam muito melhor)
+-   Um dos primeiros produtos de Hadley Wickham
+-   Construir seu gráfico camada por camada
+-   Começar por especificar um conjunto de dados: `penguin`
+    -   Variáveis `bill_length_mm` e `body_mass_g`
+
+```{r make_peng, echo = FALSE, mysize=TRUE, size='\\tiny'}
+pd <- readxl::read_excel(here("penguins.xlsx"), na = "NA") %>% 
+  filter(!(is.na(bill_length_mm)|is.na(body_mass_g)|is.na(sex))) %>% 
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g, species) 
+glimpse(head(pd))
+```
+
+------------------------------------------------------------------------
+
+```{r gg1,  echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+ggplot()
+```
+
+------------------------------------------------------------------------
+
+```{r gg2,  echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+ggplot(data = pd)
+```
+
+------------------------------------------------------------------------
+
+```{r gg3, echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+ggplot(data = pd, aes(x = bill_length_mm, body_mass_g ))
+```
+
+------------------------------------------------------------------------
+
+```{r gg4,  echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+ggplot(data = pd, aes(x = bill_length_mm, body_mass_g )) + 
+  geom_point()
+```
+
+------------------------------------------------------------------------
+
+```{r gg5,  echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+ggplot(data = pd, aes(x = bill_length_mm, body_mass_g )) + 
+  geom_point(color = "dodgerblue")
+```
+
+------------------------------------------------------------------------
+
+```{r gg6,  echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+ggplot(data = pd, aes(x = bill_length_mm, body_mass_g, color = body_mass_g)) + 
+  geom_point()
+```
+
+------------------------------------------------------------------------
+
+```{r gg7,  echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+ggplot(data = pd, aes(x = bill_length_mm, body_mass_g, color = species )) + 
+  geom_point()
+```
+
+------------------------------------------------------------------------
+
+```{r gg8,  echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+ggplot(data = pd, aes(x = bill_length_mm, body_mass_g, color = species)) + 
+  geom_point() +
+  labs(title = "Uma Boa Introdução aos Gráficos de Dispersão", x = "Comprimento do Bico (mm)",
+       y = "Massa Corporal (g)") +
+  scale_colour_manual(values = c("#800000FF", "#767676FF", "#155F83FF")) +
+  theme_bw()
+```
+
+## Recursos - `ggplot`
+
+-   Winston Chang, **R Graphics Cookbook**, 2Ed., https://r-graphics.org
+-   Kieran Healy, **Data Visualization: A Practical Introduction**, https://socviz.co
+-   https://r-graph_gallery.com - examples of many types of graphs with explanations and code
+-   `ggplot` cheat sheet
+
+## Histograma de `age`
+
+```{r age_histgg, echo = TRUE, fig.align = "center", out.width = "75%"}
+avg_age <- mean(fm_mk2$age)
+ggplot(data = fm_mk2, aes(x = age)) + 
+  geom_histogram(bins = 30) + 
+  geom_vline(xintercept = avg_age, colour = "darkred", size = 2)
+```
+
+## Segundo Gráfico que Mostra Distribuições Bem - *Boxplot*
+
+```{r fute_mod1, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here('images', 'boxplot.png'))
+```
+
+-   source: https://r-graph-gallery.com
+
+## *Boxplot* com os Dados de Futebol
+
+```{r age_boxgg, echo = TRUE, mysize=TRUE, size='\\scriptsize', fig.align = "center", out.width = "75%"}
+fm_mk2 |> ggpubr::ggboxplot(x = "age_grp",
+                            y = "age",
+                            add = "mean",
+                            ggtheme = theme_bw())
+  
+```
+
+## *Boxplot* de Futebol com `ggplot`
+
+```{r box2gg, echo = TRUE, eval = FALSE}
+
+fm_mk2 |> 
+  ggplot(mapping = aes(x = age_grp,  y = age,)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", geom = "point", shape = 23, 
+               size = 3, fill = "blue") +
+  labs(title = "Idades por Grupo de Idade",
+       x = "Grupos de Idade",
+       y = "Idade",
+       caption = "Texto que explica o gráfico.") +
+  theme_bw()
+  
+```
+
+------------------------------------------------------------------------
+
+```{r box2prgg, eval = TRUE, echo = FALSE}
+
+fm_mk2 |> 
+  ggplot(mapping = aes(x = age_grp,  y = age,)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", geom = "point", shape = 23, 
+               size = 3, fill = "blue") +
+  labs(title = "Idades por Grupo de Idade",
+       x = "Grupos de Idade",
+       y = "Idade",
+       caption = "Texto que explica o gráfico.") +
+  theme_bw()
+ 
+```
+
+## De Onde Veio Esta Informação sobre a Média?
+
+::::: columns
+::: {.column width="70%"}
+```{r chang_left, echo = FALSE, fig.align='center'}
+
+knitr::include_graphics(here('images', 'chang_stat_summary.png'))
+```
+:::
+
+::: {.column width="30%"}
+```{r chang_right, echo = FALSE, fig.align='center'}
+
+knitr::include_graphics(here('images', 'chang_cover.png'))
+
+```
+:::
+:::::
+
+## `ggplot` *Boxplot* - 2 {.smaller}
+
+-   Gostaria de saber onde cai os pontos
+
+    -   `geom_jitter` - mostra todos os pontos com um pouco de variação
+
+    -   `geom_rug` - mostra os casos individuais numa certa dimensão
+
+```{r box3gg, eval = FALSE, echo = TRUE}
+
+fm_mk2 |> 
+  ggplot(mapping = aes(x = age_grp,  y = age,)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", geom = "point", shape = 23, size = 3, fill = "blue") +
+  geom_jitter(alpha = .3, color = "red") +
+  geom_rug() +
+  labs(title = "Idades por Grupo de Idade",
+       x = "Grupos de Idade",
+       y = "Idade",
+       caption = "Texto que explica o gráfico.") +
+  theme_bw()
+
+```
+
+------------------------------------------------------------------------
+
+```{r box3prgg, eval = TRUE, echo = FALSE}
+
+fm_mk2 |> 
+  ggplot(mapping = aes(x = age_grp,  y = age,)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", geom = "point", shape = 23, size = 3, fill = "blue") +
+  geom_jitter(alpha = .3, color = "red") +
+  geom_rug() +
+  labs(title = "Idades por Grupo de Idade",
+       x = "Grupos de Idade",
+       y = "Idade",
+       caption = "Texto que explica o gráfico.") +
+  theme_bw()
+
+```
+
+## Lição Disso
+
+-   Com muitos pontos, impossível ver a distribuição
+
+-   Criar uma versão com só 100 pontos
+
+```{r box3agg, eval = FALSE, echo = TRUE}
+
+fm_mk2 |> 
+  slice_sample(n = 100) |> 
+  ggplot(mapping = aes(x = age_grp,  y = age,)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", geom = "point", shape = 23, size = 3, fill = "blue") +
+  geom_jitter(alpha = .3, color = "red") +
+  geom_rug() +
+  labs(title = "Idades por Grupo de Idade",
+       x = "Grupos de Idade",
+       y = "Idade",
+       caption = "Texto que explica o gráfico.") +
+  theme_bw()
+
+
+```
+
+------------------------------------------------------------------------
+
+```{r box3aprgg, eval = TRUE, echo = FALSE}
+
+set.seed(42)
+fm_mk2 |> 
+  slice_sample(n = 100) |> 
+  ggplot(mapping = aes(x = age_grp,  y = age,)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", geom = "point", shape = 23, size = 3, fill = "blue") +
+  geom_jitter(alpha = .3, color = "red") +
+  geom_rug() +
+  labs(title = "Idades por Grupo de Idade",
+       x = "Grupos de Idade",
+       y = "Idade",
+       caption = "Texto que explica o gráfico.") +
+  theme_bw()
+
+```
+
+## Alternativa de Boxplot – Gráfico de Violino
+
+-   Mostra concentrações de dados pela largura da caixa invés de *jitter* e *rug*
+
+```{r viol3agg, eval = FALSE, echo = TRUE}
+
+fm_mk2 |> 
+  ggplot(mapping = aes(x = age_grp,  y = age,)) +
+  geom_violin() +
+  stat_summary(fun = "mean", geom = "point", shape = 23, size = 3, fill = "blue") +
+  labs(title = "Idades por Grupo de Idade",
+       x = "Grupos de Idade",
+       y = "Idade",
+       caption = "Texto que explica o gráfico.") +
+  theme_bw()
+
+
+```
+
+------------------------------------------------------------------------
+
+```{r viol3prgg, eval = TRUE, echo = FALSE}
+
+fm_mk2 |> 
+  ggplot(mapping = aes(x = age_grp,  y = age,)) +
+  geom_violin() +
+  stat_summary(fun = "mean", geom = "point", shape = 23, size = 3, fill = "blue") +
+  labs(title = "Idades por Grupo de Idade",
+       x = "Grupos de Idade",
+       y = "Idade",
+       caption = "Texto que explica o gráfico.") +
+  theme_bw()
+
+```
+
+## Plotagem de Densidade {.smaller}
+
+-   Tecnicamente, uma plotagem de densidades de *kernels*
+
+    -   *Kernel Density* divide a distribuição em partes e calcular a densidade em cada região não-linearmente e recombinar elas para compôr uma curva suave
+
+-   Usar `body_mass_g` para ilustrar
+
+```{r dens1gg, eval = FALSE, echo = TRUE}
+
+set.seed(42)
+pd |> # dataframe penguins |> 
+  ggplot(mapping = aes(x = body_mass_g)) +
+  geom_density() +
+  labs(title = "Massa Corporal",
+       x = "") +
+  geom_rug()+
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+```{r dens1prgg, eval = TRUE, echo = FALSE}
+
+set.seed(42)
+pd |> # dataframe penguins |> 
+  ggplot(mapping = aes(x = body_mass_g)) +
+  geom_density() +
+  labs(title = "Massa Corporal",
+       x = "") +
+  geom_rug()+
+  theme_bw()
+```
+
+## Densidade com Histograma
+
+```{r denshistgg, eval = FALSE, echo = TRUE}
+
+pd |> # dataframe penguins |> 
+  ggplot(mapping = aes(x = body_mass_g)) +
+  geom_histogram(aes(y = ..density..), bins = 20, alpha = 0.5) +
+  geom_density(colour = "darkred") +
+  labs(title = "Massa Corporal",
+       x = "massa corporal (g)") +
+  theme_bw()
+
+
+```
+
+------------------------------------------------------------------------
+
+```{r denshistprgg, eval = TRUE, echo = FALSE}
+
+pd |> # dataframe penguins |> 
+  ggplot(mapping = aes(x = body_mass_g)) +
+  geom_histogram(aes(y = ..density..), bins = 20, alpha = 0.5) +
+  geom_density(colour = "darkred") +
+  labs(title = "Massa Corporal",
+       x = "massa corporal (g)") +
+  theme_bw()
+
+
+
+
+```
+
+## Comparar As Espécies
+
+```{r dens2gg, eval = FALSE, echo = TRUE}
+
+set.seed(42)
+pd |> # dataframe penguins |> 
+  group_by(species) |> 
+  ggplot(mapping = aes(x = body_mass_g, colour = species, fill = species)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Massa Corporal",
+       x = "") +
+  geom_rug()+
+  theme_bw()
+
+```
+
+------------------------------------------------------------------------
+
+```{r dens2prgg, eval = TRUE, echo = FALSE}
+
+set.seed(42)
+pd |> # dataframe penguins |> 
+  group_by(species) |> 
+  ggplot(mapping = aes(x = body_mass_g, colour = species, fill = species)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Massa Corporal",
+       x = "") +
+  geom_rug()+
+  theme_bw()
+```
+
+## Gráfico *Ridgeline* - Extensão de Densidade
+
+-   Maneira fácil para comparar as densidades de várias categorias das variáveis
+
+-   Precisa instalar `ggridges` de CRAN
+
+```{r ridge1gg, eval = FALSE, echo = TRUE}
+
+library(ggridges)
+
+pd |> 
+  ggplot(aes(x = body_mass_g, 
+             y = species, 
+             colour = species, 
+             fill = species)) +
+  geom_density_ridges() +
+  theme_gray() # default theme for ggplot
+```
+
+------------------------------------------------------------------------
+
+```{r ridge1prgg, eval = TRUE, echo = FALSE}
+
+library(ggridges)
+
+pd |> 
+  ggplot(aes(x = body_mass_g, 
+             y = species, 
+             colour = species, 
+             fill = species)) +
+  geom_density_ridges() +
+  theme_gray() # default theme for ggplot
+
+```
+
+## *Ridgeline* com Mais Ooomph {.smaller}
+
+-   Mudar cores para uma paleta mais agradável
+
+    -   Usar `ggsci` paleta `uchicago`
+
+-   Tirar a legenda - desnecessária
+
+-   Reduz o tamanho das caudas
+
+-   Mostrar os quartis nas curvas de densidade
+
+```{r ridge2gg, eval = FALSE, echo = TRUE}
+
+library(ggridges)
+
+pd |> 
+  ggplot(aes(x = body_mass_g, 
+             y = species, 
+             fill = species)) +
+  stat_density_ridges(quantile_lines = TRUE, rel_min_height = 0.01) +
+  scale_fill_uchicago(palette = "default", alpha = 0.8) +
+  guides(fill = FALSE) +
+  labs(title = "Massa Corporal por Espécie",
+       x = "Massa Corporal (g)",
+       y = "") +
+  theme_gray() # default theme for ggplot
+
+
+```
+
+------------------------------------------------------------------------
+
+```{r ridge2prgg, eval = TRUE, echo = FALSE}
+
+library(ggridges)
+
+
+pd |> 
+  ggplot(aes(x = body_mass_g, 
+             y = species, 
+             fill = species)) +
+  stat_density_ridges(quantile_lines = TRUE, rel_min_height = 0.01) +
+  scale_fill_uchicago(palette = "default", alpha = 0.8) +
+  guides(fill = FALSE) +
+  labs(title = "Massa Corporal por Espécie",
+       x = "Massa Corporal (g)",
+       y = "") +
+  theme_gray() # default theme for ggplot
+
+
+```
+
+## Gráfico *Radar* - Outra Maneira de Retratar Dimensões
+
+-   Cria um campo circular para mostrar um número de dimensões
+
+-   Funciona melhor comparando poucas classes
+
+-   Precisa preparar os dados para utilizar este tipo de gráfico
+
+    -   Comparando ou a média ou mediana das classes em cada dimensão
+
+    -   Vai pôr as dimensões na escala de 0 até 1 utilizando `scales::rescale()`
+
+-   **Usa pacote `ggradar`**
+
+    -   **remotes::install_github("ricardo-bion/ggradar")**
+
+## Radar - Preparação dos Dados
+
+```{r prepradar}
+
+pacman::p_load(ggradar, scales)
+
+pd_radar <- pd |> 
+  tidyr::drop_na() |>    # NAs can't be processed in ops below
+  group_by(species)  |> 
+  summarise(
+    avg_bill_length = mean(bill_length_mm),
+    avg_bill_depth = mean(bill_depth_mm),
+    avg_flipper_length = mean(flipper_length_mm),
+    avg_body_mass = mean(body_mass_g)
+  )  |> 
+  ungroup()  |> 
+  mutate_at(vars(-species), rescale)
+pd_radar
+```
+
+## Código do Gráfico
+
+```{r radardraw}
+
+ggpengrad <- pd_radar %>%
+  ggradar(
+    font.radar = "arial",
+    grid.label.size = 5,  # Affects the grid annotations (0%, 50%, etc.)
+    axis.label.size = 3, # Afftects the names of the variables
+    group.point.size = 3,  # Simply the size of the point 
+    legend.title = "Espécie",
+    plot.title = "Características - Pinguins Palmer",
+  )
+
+```
+
+## Resultado
+
+```{r radartela, echo = FALSE}
+
+ggpengrad
+```
+
+# Último Tipo de Hoje
+
+## Incorporar Gráficos com Testes Estatísticos {.smaller}
+
+-   Pacote `ggstatsplot` - precisa instalar da CRAN
+
+-   Pacote tem muitos combinações por vários testes
+
+-   Diferença entre a média de massa corporal dos especies é significativa?
+
+```{r mix1gg, eval = FALSE, echo = TRUE}
+
+library(ggstatsplot)
+pd |> 
+  ggbetweenstats(
+    x = species,  
+    y = body_mass_g,
+    type = "nonparametric",
+    p.adjust.method = "bonferroni",
+    xlab = "Especie",
+    ylab = "Massa Corporal (g)",
+    title = "Massa Corporal entre Especies",
+    ggtheme = theme_bw(),
+    package = "ggsci",
+    palette = "default_uchicago"
+  )
+
+```
+
+------------------------------------------------------------------------
+
+```{r mix2gg, eval = TRUE, echo = FALSE}
+
+library(ggstatsplot)
+pd |> 
+  ggbetweenstats(
+    x = species,  
+    y = body_mass_g,
+    type = "nonparametric",
+    p.adjust.method = "bonferroni",
+    xlab = "Especie",
+    ylab = "Massa Corporal (g)",
+    title = "Massa Corporal entre Especies",
+    ggtheme = theme_bw(),
+    package = "ggsci",
+    palette = "default_uchicago"
+  )
+
+
+```
+
+## Uso de Plotagens com Stats
+
+-   Eu uso essas plotagens para minha análise das variáveis, não para a apresentação
+
+-   Têm muita informação para apresentações; não simplifica a visualização
