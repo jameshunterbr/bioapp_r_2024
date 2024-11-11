@@ -1,0 +1,522 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "DIY Funções"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-11-19"
+format:
+  revealjs:
+    theme: beige
+#    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, summarytools, janitor, knitr, ggsci)
+gr <- here("images")
+```
+
+# Funções - Além do Que R Pode Fazer {background-color="blue" background-image="graphics/computer graphcarlos-muza.jpg"}
+
+## Funções em R
+
+-   Já conhecemos funções que R fornece
+
+-   Funções simples matemáticas
+
+    -   sqrt(), max(), mean()
+
+-   Funções que ajuda manipular dados e conjuntos de dados
+
+    -   Manipulação
+
+        -   arrange(), select(), left_join()
+
+    -   Conjuntos de dados
+
+        -   read_excel(), saveRDS(), read_csv()
+
+## Como Funciona as Funções Internas de R {.smaller}
+
+-   São scripts de R que executam os comandos necessárias para o resultado
+
+-   Funções podem chamar outras funções escritas em outras linguagens (e.g., C, FORTRAN)
+
+-   Exemplo: `chisq_test()` – executa o teste estatístico $\chi^2$ em 2 vetores
+
+-   Definição
+
+    ```         
+    chisq_test(x, y = NULL, correct = TRUE, p = rep(1/length(x), length(x)),
+      rescale.p = FALSE, simulate.p.value = FALSE, B = 2000)
+    ```
+
+```{r chisq1}
+
+set.seed(42)
+x <- sample(1:500, 200, replace = TRUE)
+y <- sample(500:1000, 200, replace = TRUE)
+
+chisq.test(x, y)
+```
+
+## Abaixo do Pano
+
+```{r chisq2, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here('images', 'chisq_code.png'))
+```
+
+## Quando Deve Escrever Sua Própria Função {.smaller}
+
+-   Temos tendência de copiar/colar blocos de código que queremos utilizar
+
+    -   Trocando um elemento, nome de variável, paramêtro, etc.
+
+-   Esta prática induz erros
+
+    -   Se for na programação (R levanta um erro), precisa fazer debugging
+
+    -   Pode ser no resultado – você consegue perceber que o resultado do cálculo é errado
+
+        -   Perda de controle
+
+::: callout-important
+Se vai cópiar um bloco de código mais de **duas vezes**, trocar ele para uma função
+:::
+
+## Um Exemplo[^1] {.smaller}
+
+[^1]: Emprestado de Wickham, Cetinkaya-Rundel, e Grolemund, **R for Data Science** (2ª Edição)
+
+-   Quero que as variáveis de um tibble ficam no intervalo entre 0 e 1
+
+    -   Mas recebo os valores numa outra escala
+
+```{r rescale_base}
+set.seed(42)
+data <- tibble(
+  a = rnorm(5),
+  b = rnorm(5),
+  c = rnorm(5),
+  d = rnorm(5),
+)
+data
+```
+
+## Para Calcular a Nova Escala para Variável `a`
+
+-   Para caso `i` de variável `a`
+
+$$
+\frac{a_{i}-min(a)}{max(a) - min(a)} 
+$$
+
+```{r new_scale}
+
+nova_a <- data |>
+  mutate(a = (a - min(a, na.rm = TRUE)) / 
+    (max(a, na.rm = TRUE) - min(a, na.rm = TRUE))) |> 
+  pull(a)
+nova_a
+```
+
+## Código - Um Pouco Mais Eficiente
+
+```{r}
+
+range_a <- range(data$a, na.rm = TRUE)
+range_a
+nova_a <- data |>
+  mutate(a = (a - range_a[1]) / 
+    (range_a[2] - range_a[1])) |> 
+  pull(a)
+nova_a
+```
+
+## Uma Solução {.smaller}
+
+```{r}
+
+nova_data <- data |> 
+  mutate(
+  a = (a - min(a, na.rm = TRUE)) / 
+    (max(a, na.rm = TRUE) - min(a, na.rm = TRUE)),
+  b = (b - min(b, na.rm = TRUE)) / 
+    (max(b, na.rm = TRUE) - min(b, na.rm = TRUE)),
+  c = (c - min(c, na.rm = TRUE)) / 
+    (max(c, na.rm = TRUE) - min(c, na.rm = TRUE)),
+  d = (d - min(d, na.rm = TRUE)) / 
+    (max(d, na.rm = TRUE) - min(d, na.rm = TRUE)),
+)
+nova_data
+
+```
+
+# Live Coding
+
+Vamos ao Posit Cloud
+
+## O Que Estamos Tentando Fazer com a Função
+
+-   O cálculo que colocamos dentro da função
+
+```{r func_def, eval = FALSE}
+(a - min(a, na.rm = TRUE)) / (max(a, na.rm = TRUE) - min(a, na.rm = TRUE))
+
+```
+
+-   Cada vez que tem um `a`, sabemos que esse vai ser aplicado a todas as variáveis `a` - `d`
+
+-   Cada vez que chamamos a função, vai ter outra variável no lugar de `a`
+
+## Estrutura de Uma Função {.smaller}
+
+-   3 Elementos
+
+    -   Nome - algo que podemos usar para referir à função (rescale1)
+
+        -   "1" porque vai ter mais versões
+
+    -   Argumentos - as coisas que variam entre as vezes que chamamos a função
+
+        -   Aqui as variáveis
+
+    -   Corpo - código que está sendo repetido em todas as chamadas da função
+
+```{r eval = FALSE}
+
+nome <- function(argumentos){ 
+  corpo 
+  }
+```
+
+## Função Nossa
+
+-   Chamar o **argumento** `v` (para variável)
+
+```{r rescale1}
+
+rescale1 <- function(v) {
+  (v - min(v, na.rm = TRUE)) / (max(v, na.rm = TRUE) - min(v, na.rm = TRUE))
+}
+```
+
+## Antes de Aplicar - Testar
+
+-   Sempre queremos testar nossas funções para ver que estão produzindo resultados corretos
+
+-   Vamos dar para funções vários vetores para ver se faz certo
+
+```{r}
+
+rescale1(c(-10, 0 , 10))
+rescale1(c(1, 2, 3, 4, 5))
+rescale1(c(1, 2, 3, 4, 101))
+```
+
+## Substituir a Função no Código Original - Velho
+
+```{r old_code}
+
+nova_data <- data |> 
+  mutate(
+  a = (a - min(a, na.rm = TRUE)) / 
+    (max(a, na.rm = TRUE) - min(a, na.rm = TRUE)),
+  b = (b - min(b, na.rm = TRUE)) / 
+    (max(b, na.rm = TRUE) - min(b, na.rm = TRUE)),
+  c = (c - min(c, na.rm = TRUE)) / 
+    (max(c, na.rm = TRUE) - min(c, na.rm = TRUE)),
+  d = (d - min(d, na.rm = TRUE)) / 
+    (max(d, na.rm = TRUE) - min(d, na.rm = TRUE)),
+)
+nova_data
+
+
+```
+
+## Com Função
+
+```{r}
+
+nova_data2 <- data |> 
+  mutate(
+  a = rescale1(a),
+  b = rescale1(b),
+  c = rescale1(c),
+  d = rescale1(d),
+  )
+nova_data2
+```
+
+## Criar uma Função que Falta em R
+
+-   e.g., Coeficiente de Variação - mede a variabilidade de uma distribuição em relação à média
+
+$$
+CV=\frac{\sigma}{\mu}
+$$
+
+-   A relação de desvio padrão à média – maior a relação, maior a variabilidade
+
+-   CV maior que 1 normalmente indica um problema com a alta variabilidade da distribuição
+
+-   Existe em vários pacotes, mas não em Base R
+
+-   Se queremos usar ele dentro de `dplyr::summarize()`, precisamos criar uma função
+
+## Criar a Função `cv`
+
+O que a função vai fazer?
+
+-   Recebe um vetor dos dados (argumento)
+
+    -   Pode ser no formato de uma variável de um data frame
+
+-   Calcular a média (`mean()`) e desvio padrão (`sd()`) do vetor
+
+-   Retornar o valor da divisão do desvio padrão pela média
+
+## Programação - "Pseudo-Code"
+
+```{r pseudo_func}
+set.seed(42)
+v <- sample(1:100, 10, replace = TRUE) # criar um vetor
+
+s <-  sd(v, na.rm = TRUE)
+print(paste0("s = ", round(s, 3)))
+m <-  mean(v, na.rm = TRUE)
+print(paste0("m = ", round(m, 3)))
+
+cv <- s/m
+print(paste0("cv = ", round(cv, 4)))
+```
+
+## Programação - a Função
+
+-   Nome: `cv` (qualquer coisa que queremos)
+
+-   Argumento: um vetor
+
+    -   Para testes, vamos continuar com o vetor `v` que já definimos
+
+```{r cv_funca, eval = FALSE}
+
+cv <- function(v){
+  ...
+}
+```
+
+```{r cv_funcb}
+
+cv <- function(v){
+  m <- mean(v, na.rm = TRUE)
+  s <- sd(v, na.rm = TRUE)
+  cv <- s/m
+  return(cv)
+}
+```
+
+Testar a função com nosso vetor `v`, que vamos renomear para `vec`
+
+```{r cv_funcc}
+
+vec <- v
+
+cv(v)
+```
+
+## Podemos Fazer a Função Mais Eficiente
+
+-   Pode combinar os cálculos em 1 linha
+
+-   R automaticamente retorna ao ambiente superior o resultado da última linha - não precisa uma linha de `return()`
+
+```{r cv_funcd}
+
+cv_old <- function(v){
+  m <- mean(v, na.rm = TRUE) 
+  s <- sd(v, na.rm = TRUE)
+  cv <- s/m
+  return(cv)
+}
+
+cv <- function(v){
+  sd(v, na.rm = TRUE) / mean(v, na.rm = TRUE)
+}
+
+(cv(v))
+```
+
+## Testar a Função
+
+```{r}
+
+cv(c(-100, 0, 200))
+cv(runif(rnorm(100, mean = 10, sd = 3.14)))
+cv(c(-100, 0, 200, NA))
+```
+
+## Podemos Usar Dentro de `dplyr::summarize()`
+
+```{r}
+data |> 
+  summarise(cv_a = cv(a),
+            cv_b = cv(b),
+            cv_c = cv(c),
+            cv_d = cv(d))
+```
+
+::: callout-warning
+Pode cv ser negativo como cv_d? Explique porque
+:::
+
+## Funções que Usam Verbos de *Tidyverse* {.smaller}
+
+-   Vamos tentar usar verbos de *tidyverse* dentro de uma função
+
+-   Dados vêm de um estudo de 2022 de Prof. Reinaldo Salamão sobre casos clínicos de COVID-19
+
+-   Só alguns dos dados
+
+```{r sars_data}
+
+covid <- readRDS(here("mad_covid_data.rds"))
+head(covid, 10)
+```
+
+## Se Só Vamos Fazer Único Cálculo com `covid` 
+
+```{r sars_0}
+
+covid |> 
+    group_by(death) |> 
+    summarise(mean(crp, na.rm = TRUE))
+```
+
+## Função {.smaller}
+
+-   Desenvolver função que mede a média de qualquer uma das variáveis quantitativas agrupada por uma das variáveis categóricas
+
+-   Agrupamento: verbo `group_by()` : `group_by(death)`
+
+-   Determinar a média: mean() - lembre a usar o argumento `na.rm=TRUE` porque existem, sim
+
+```{r sars_2}
+
+gr_media <- function(grp_var, calc_var){
+  covid |> 
+    group_by(grp_var) |> 
+    summarise(mean(calc_var, na.rm = TRUE))
+}
+```
+
+## Testar a Função
+
+```{r sars_3, eval = FALSE}
+
+gr_media(death, crp)
+```
+
+```{r sars_4, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here('images', 'function_error_crp_death.png'))
+```
+
+## ???? - Tidy Evaluation {.smaller}
+
+-   Problema vem porque os comandos de *tidyverse* sempre usam "*tidy evaluation*"
+
+-   *tidy evaluation* permite referência aos nomes das varíaveis de um tibble sem tratamento special
+
+-   Funções que passam nomes de colunas (variáveis) de tibbles para um verbo de `dplyr` usam *tidy evaluation*
+
+-   `cv` está passando `death` e `crp` para verbos de `dplyr`
+
+-   `cv` vai tentar explicitamente avaliar `grp_var` como se fosse uma variável de um tibble
+
+    -   Mas, é um placeholder que seria substituído por `death` na função
+
+    -   Semelhente com `calc_var` e `crp`
+
+## Diagrama Facilita Entendimento
+
+```{r sars_5, echo = FALSE, fig.align='center', out.width = "70%"}
+
+knitr::include_graphics(here('images', 'mermaid_tidy_eval.png'))
+
+```
+
+## Abraçando a Variável {.smaller}
+
+-   Deve ter maneira para avisar `group_by()` e `summarise()` para não tratar `group_var` e `mean_var` como os nomes das variáveis
+
+    -   Invés disso, R deve olhar dentro destas variáveis para achar a variável que queremos usar
+
+-   Fazemos isso com **o abraço,** abraçando a variável com dupla chaves – {{ var }}
+
+    -   `{{ grp_var }}`
+
+-   Assim, R olhe dentro da `grp_var` para achar a variável que realmente está em jogo.
+
+    -   Diz: "Oi, grp_var é um placeholder. Olhe nos argumentos da chamada para a variável verdadeiro"
+
+        -   Que é `death`
+
+## `cv` com Abraço
+
+```{r sars_6}
+
+gr_media <- function(grp_var, calc_var){
+  covid |> 
+    group_by({{ grp_var }}) |> 
+    summarise(mean({{ calc_var }}, na.rm = TRUE))
+}
+
+gr_media(death, crp)
+```
+
+## `across()` & Funções Anônimas
+
+-   Voltamos a 1º conjunto hoje: `data` com 4 variáveis `a` - `d`
+
+-   Podemos aplicar a função `cv` para todas as variáveis em 1 linha
+
+-   across() aplica uma função em mais de uma coluna em 1 comando
+
+-   `across(.cols, .fns, ...)` – syntaxe
+
+-   Se o que queremos é uma pequena função de poucas palavras,
+
+    -   Podemos usar uma função anônima - uma função sem nome
+
+## Aplicar `cv` para `data` `a` - `d` {.smaller}
+
+-   Anote as duas maneiras para escrever uma função anônima
+
+```{r anon}
+
+data |> 
+  mutate(across(a:d, function(x) cv(x)))
+
+data |> 
+  mutate(across(a:d, \(x) cv(x)))
+```
+
+## Muito Mais sobre Funções
+
+-   Só o início sobre funções
+
+-   Precisa estudar a documentação, esp. R4DS
