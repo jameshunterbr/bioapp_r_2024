@@ -43,3 +43,14 @@ Aqui vou depositar os arquivos que vamos usar nas aulas de R no eletivo de Biome
 -   aula_2_munging_24.pdf
 
 -   licao_de_casa_2_24.pdf
+
+### Arquivos - Aula 3
+
+-  aula_3_code_format_24.pdf
+
+-  aula_3_data_viz_24.pdf
+
+-  aula_3_func_24b.pdf
+
+-  aula_3_novo_rec_24.pdf (novas recomendações de livros)
+  
