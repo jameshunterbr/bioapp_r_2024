@@ -1,0 +1,97 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Novos Recursos"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-11-19"
+format:
+  revealjs:
+    theme: beige
+#    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, summarytools, janitor, knitr, gt, ggsci)
+gr <- here("images")
+```
+
+# Novos Recursos {background-color="blue" background-image="graphics/computer graphcarlos-muza.jpg"}
+
+## Programação Básica em R {.smaller}
+
+-   Garrett Grolemund, **Hands-On Programming with R**
+
+    -   <https://rstudio-education.github.io/hopr/index.html>
+
+-   **+**
+
+    -   Explicações claras das funções, procedimentos, tipos de dados, etc. básicas
+
+    -   Se ainda falta conforto usando R, este é um bom lugar para reforçar as habilidades
+
+-   **-**
+
+    -   Velho: publicado em 2014
+
+```{r ggbook, echo = FALSE, fig.align='center', out.width = "90%"}
+
+knitr::include_graphics(here('images', 'hopr grolemund.jpeg'))
+```
+
+## Biologia Genômica {.smaller}
+
+-   Susan Holmes, Wolfgang Huber, **Modern Statistics for Modern Biology**
+
+    -   <https://web.stanford.edu/class/bios221/book/>
+
+<!-- -->
+
+-   \+
+
+    -   Boa e clara explicação da estatística aplicada aos problemas na biologia como expressão de genes
+    -   Inclui Bioconductor
+
+-   \-
+
+    -   Presume que você teve cursos avançados de estatística
+
+```{r holmes_book, echo = FALSE, fig.align='center', out.width = "100%"}
+
+knitr::include_graphics(here('images', 'msmb holmes.jpg'))
+```
+
+## Análise Genômica {.smaller}
+
+-   Altuna Alkalin, **Computational Genomics with R**
+
+    -   <https://compgenomr.github.io/book/>
+
+-   **+**
+
+    -   Tratamento direto de como fazer os procedimentos que quer tratar
+
+    -   Inclui sequenciamento e alinhamento
+
+    -   Inclui Bioconductor
+
+-   **-**
+
+    -   Explicações são opacas as vezes (precisou mais redatores)
+
+```{r akalin_book, echo = FALSE, fig.align='center', out.width = "90%"}
+
+knitr::include_graphics(here('images', 'akalin_cover.jpg'))
+```
