@@ -1,0 +1,410 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Intro -- Bioconductor"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-11-26"
+format:
+  revealjs:
+    theme: beige
+#    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, summarytools, janitor, knitr, gt, ggsci,
+               bioseq, Biostrings )
+gr <- here("images")
+```
+
+# Bioconductor {background-color="blue" background-image="computer graphcarlos-muza.jpg"}
+
+## Instalação de Bioconductor
+
+```{r inst_bioc, eval = FALSE}
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(c("Biostrings", "Biobase", "S4Vectors", "rtracklayer", "GenomicRanges", "IRanges", "GenomeInfoDb", "SummarizedExperiment", "BSGenome" ))
+```
+
+-   Amostra dos quase 2.300 pacotes disponíveis
+
+## Ferramenta `Biostrings` {.smaller}
+
+-   Pacote com as funções básicas para a manipulação das sequências
+
+-   Sequências são aqui tratadas como objetos de S4 classes:
+
+    -   `DNAString`, `RNAString`, `AAString`
+
+    -   Estruturas eficientes de memoria
+
+    -   Fazem verificações automáticas da validade dos *strings*
+
+    -   Utilizem métodos para utilidades da manipulação dos `strings`
+
+## S4 - Revisão
+
+```{r s4, echo = FALSE, fig.align='center', out.width = "80%"}
+
+knitr::include_graphics(here('images', 'bioc_s4.png'))
+
+```
+
+## Construir uma Sequência de DNA
+
+-   Em S4, a criação de um objeto está chamada **construção** e o método (`DNAString()`) é um **construtor**
+
+```{r newdna}
+
+seq_dna1 <- DNAString("ACTTTGGCTAAG")
+seq_dna1
+```
+
+-   Até agora, fácil de entender
+
+## Dentro da Memoria
+
+-   Agora organizada como uma classe com 5 "slots" denotados por "`@`"
+
+```{r newdna_str}
+
+str(seq_dna1)
+```
+
+## Verificação Automática
+
+-   Se a sequência realmente é uma sequência de DNA, simplesmente a função aceita e você vê no `Environment` de Rstudio
+
+-   Mesmo com caracteres ambíguos, vai ser a mesma coisa
+
+-   Diferente com caracteres que não são do alfabeto IUPAC
+
+```{r checkDNA}
+
+# string ok
+seq_dna1 <- DNAString("ACTTTGGCTAAG")
+
+# string com ambiguous
+seq_dna2 <- DNAString("TGATTGCTTGGTTGMTT")
+```
+
+```{r seq3, echo = FALSE, fig.align='center', out.width = "90%"}
+
+knitr::include_graphics(here('images', 'bad_dna_seq3.png'))
+
+```
+
+## StringSets
+
+-   Pode criar grupos (sets) de sequências em um objeto, um `DNAStringSet`
+
+-   Esse comando é um contstrutor
+
+-   Elementos devem ser *strings*
+
+-   Muito outras maneiras de construir stringsets, mas avançado
+
+```{r stringset}
+
+seqs_set1 <- c("ACTTTGGCTAAG", "TGATTGCTTGGTTGMTT") 
+
+
+```
+
+# Mesmo Processo para RNA e AA's {background-color="green"}
+
+# Ferramentas para xStrings {background-color="blue"}
+
+## Correspondência de Padrões (*Pattern Matching*) {.smaller}
+
+-   Mostra as opções mas não faz a desambiguação
+
+```{r pattern1}
+
+IUPAC_CODE_MAP[5:15]
+seq_dna2
+# se fixed = FALSE, codigos ambiguous podem ser extensos
+matchPattern("MT", seq_dna2, fixed = FALSE) 
+matchPattern("MT", seq_dna2, fixed = TRUE)
+```
+
+## Contar Bases {.smaller}
+
+-   `alphabetFrequency()` - equivalente de `seq_table()`
+
+```{r}
+
+alphabetFrequency(seq_dna2)
+```
+
+-   Quer saber quais bases a sequência tem - `uniqueLetters()`
+
+```{r}
+
+uniqueLetters(seq_dna2)
+```
+
+-   Só interessado em bases específicas - `letterFrequency()`
+
+    -   E com proporção (argumento `as.prob = TRUE`)
+
+```{r}
+
+letterFrequency(seq_dna2, letters = c("CG"))
+letterFrequency(seq_dna2, letters = c("CG"), as.prob = TRUE)
+```
+
+## Essas Funções Servem Bem para Sequências Grandes
+
+-   Importação feito com `readxxxStringSet()` utilizando um arquivo fasta
+
+```{r gag_import}
+
+gag_dna <- readDNAStringSet(here("gag_sequence.fasta"))
+gag_dna
+
+alphabetFrequency(gag_dna)
+uniqueLetters(gag_dna)
+letterFrequency(gag_dna, letters = "GC")
+```
+
+# VSS - Bioconductor Importar {.smaller background-color="green"}
+
+-   Só Importar com `readxxxStringSet()`
+
+## Considerações Especiais para Aminoácidos {.smaller}
+
+-   Existem 2 alfabetos para AAs
+
+    -   Padrão - `AA_STANDARD` – 20 AA's que todos conhecem
+
+    -   Proteinogenic – `AA-PROTEINOGENIC` - mais 2 AAs ("U" e "O")
+
+        -   Em **algumas espécies**, codons normalmente interpretados como codons *stop*
+
+```{r}
+AA_STANDARD
+AA_PROTEINOGENIC
+setdiff(AA_PROTEINOGENIC, AA_STANDARD)
+```
+
+## Transcrição e Transcrição Reversa
+
+-   Chamar a função cujo resultado que você quer e usar como argumento o `String` ou `StringSet` apropriado
+
+```{r}
+
+(seq_rnax <- RNAString(seq_dna1))
+(seq_dnax <- DNAString(seq_rnax)) # reverter ao original
+(seq_gag_rna <- RNAStringSet(gag_dna))
+```
+
+## Codons {.smaller}
+
+-   Pode olhar diretamente nos codons no seu DNA string
+
+```{r codons}
+
+codons(seq_dna1)
+```
+
+-   Para vertente (*strand*) reversa, útil de conhecer o complemento reversa
+
+```{r revcomp}
+
+reverseComplement(seq_dna1)
+codons(reverseComplement(seq_dna1))
+```
+
+## Tradução
+
+-   Pode traduzir diretamente de DNA para AA
+
+-   Para reading frames outros que 1, precisa fazer um subset do `DNAString`
+
+    -   Utilizando `base::substr()` e não `stringr::str_sub()`
+
+    -   E.g. `substr(seq_dna2, start = 2, stop = 17)`
+
+```{r}
+(seq_aa1 <- translate(seq_dna1))
+
+```
+
+## Tradução com Codons Ambíguos {.smaller}
+
+-   Argumento `if.fuzzy.codon =` oferece opções
+
+    -   = "X" – substituir "X" para qualquer codon com caracteres ambíguos
+
+    -   = "solve" – tentar de resolver a tradução
+
+        -   E.g., se for um codon sinônimo, vai achar uma solução
+
+```{r ambig_trans, warning = FALSE}
+fuzzy_dna <- DNAString("HTGATHTGRCCCYTRTRA")
+(seq_aa2 <- translate(seq_dna2, if.fuzzy.codon = "solve"))
+(seq_aa2 <- translate(seq_dna2, if.fuzzy.codon = "X"))
+```
+
+# Alinhamento {background-color="blue"}
+
+## Início {.smaller}
+
+-   Bioconductor: onde vai para achar funções de alinhamento de sequências
+
+-   Alinhamento leva 2 ou mais sequências divergentes de um único tipo
+
+    -   Produz um resultado que capta alguma qualidade de interesse
+
+-   Algoritmo está treinado para maximizar um sistema de pontuação
+
+-   Existem 2 pacotes que focam no alinhamento:
+
+    -   `DECIPHER`
+
+    -   `msa`
+
+-   Vamos usar msa só porque tenho mais experiência com ele.
+
+## Instalação de `msa`
+
+-   Como os outros pacotes que precisamos
+
+```{r install_msa, eval = FALSE}
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("msa")
+
+```
+
+## Vantagem Sinal de `msa`
+
+-   Pode usar um dos 3 algoritmos importantes para fazer o alinhamento
+
+    -   ClustalW (opção padrão)
+
+    -   ClustalOmega
+
+    -   Muscle
+
+-   Equivalente de ir para vários sites que têm acesso aos algoritmos sem precisar saïr de seu computador
+
+-   Opções típicos de alinhamento são disponíveis
+
+    -   Definir `gapOpening`, `gapExtension`, método de clustering, etc.
+
+## Exemplo – de Pacote `msa` {.smaller}
+
+```{r exemplo_msa}
+
+library(msa)
+msa_seqs_file <- system.file("examples", "exampleAA.fasta", package = "msa")
+msa_seqs <- readAAStringSet(msa_seqs_file)
+msa_seqs
+```
+
+## O Alinhamento das Sequências {.smaller}
+
+```{r align_ex}
+
+(test_align <- msa(msa_seqs, method = "ClustalW"))
+```
+
+## Visão Mais Clara do Resultado {.smaller}
+
+```{r}
+print(test_align, show = "alignment")
+```
+
+## Função Pretty Print  {.smaller}
+
+-   Para quem tem opção de imprimir em pdf através de Latex
+
+-   Função `msa::msaPrettyPrint()` dá muitas opções para formatação do alinhamento
+
+-   Este exemplo mostra regiões conservadas entre as sequências
+
+```{r pretty, echo = FALSE, fig.align='center', out.width = "80%"}
+
+knitr::include_graphics(here('images', 'pretty_print_msa.png'))
+
+
+```
+
+## Calcular com Outros Pacotes
+
+-   Mesmo pacotes fora de Bioconductor
+
+-   Vamos computar um matriz de distâncias entre as sequências de teste.
+
+-   Distância será expresso como o raiz quadrado de distância entre cada par das sequências
+
+-   `seqinr::dist.alignment()`
+
+    -   Pacote é um velho que tem ferramentas para sequências genómicas
+
+    -   Mas, `msa` tem um conversor que permite aplicação desta função
+
+## Como Funcionar {.smaller}
+
+-   1º - converter o alinhamento para o tipo `seqinr::alignment`
+
+```{r convert_msa}
+
+test_align_dist <- msaConvert(test_align, type = "seqinr::alignment")
+```
+
+-   2º – computar a matriz de distâncias em `seqinr`
+
+```{r dist_mat}
+library(seqinr)
+d <- dist.alignment(test_align_dist, matrix = "identity" )
+as.matrix(d)[1:6, 1:4]
+```
+
+## 2º Exemplo de Alinhamento com `msa`  {.smaller}
+
+-   Sequências de 17 replicatas/clones do gene gag de um paciente num estudo de nosso lab
+
+-   Arquivo fasta "`XXX_translation_result.fasta`"
+
+```{r xxx_align}
+
+aa_xxx <- readAAStringSet(here("XXX_translation_result.fasta"))
+
+align_xxx <- msa(aa_xxx, method = "ClustalOmega")
+```
+
+## Sequência de Consenso  {.smaller}
+
+-   Esse o que precisamos para fazer a próxima fase da análise
+
+```{r xxx_print}
+
+align_xxx
+msaConsensusSequence(align_xxx)
+```
+
+# Semana Que Vem em Bioconductor
+
+-   Filogenética
+
+-   Expressão dos Genes

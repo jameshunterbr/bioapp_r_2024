@@ -1,0 +1,463 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Genômica com R"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-11-26"
+format:
+  revealjs:
+    theme: beige
+#    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+{r setup, include=FALSE}
+
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+pacman::p_load(tidyverse, here, summarytools, janitor, knitr, gt, ggsci,
+               bioseq)
+gr <- here("images")
+```
+
+# Genômica Básica com R {background-color="blue" background-image="computer graphcarlos-muza.jpg"}
+
+## Ferramenta `bioseq` {.smaller}
+
+-   Pacote fora de sistema Bioconductor
+
+-   Ideia central: criar classes de vetores para armanezar sequências de DNA, RNA, e aminoácidos
+
+-   Facilita utilização das funções de base R e tidyverse para manipular esses vetores
+
+    -   Tb, conduzir operações básicas úteis
+
+    -   Vetores são baseados em tipo caractere (*strings*)
+
+-   Produto de François Keck
+
+    -   Departamento de Ecologia Aquática, Eidgenössische Anstalt für Wasserversorgung, Abwasserreinigung und Gewässerschutz, Zurich, Suíça
+
+## Diferença entre Bioconductor e `bioseq`
+
+-   Pacotes de Bioconductor (alguns 2.800) utilizam o sistema S4 de R para gravar os dados
+
+-   Pacotes de base R, tidyverse, e `bioseq` utilizam o sistema original S3
+
+-   S3 e S4 são sistemas de OOP (*object oriented programming*)
+
+    -   Também, existem R6 e S7
+
+## OOP – O que É? {.smaller}
+
+-   Um paradigma de programação
+
+    -   Programação funcional é um outro paradigma
+
+        -   Que vemos em `purrr:map()`
+
+-   OOP - objetos fazem parte de classes e têm dentro:
+
+    -   campos (variáveis) e
+
+    -   metodos (funções que podem ser aplicadas aos campos
+
+-   Linguagems como Java foram criadas como linguagens de OOP
+
+-   R é mais uma linguagem funcional
+
+-   Mas, têm pacotes escritos com a lógica de OOP
+
+    -   Como pacotes de Bioconductor (sistema S4)
+
+## DNA & RNA
+
+-   Funções bioseq::dna() e bioseq::rna() marcam sequências como esse tipo de molecula
+
+    -   Sequência é um vetor das letras dentro do alfabeto IUPAC
+
+-   Alfabeto IUPAC
+
+    -   Os quatro nucleotídeos específicos: **A, C, G, T** (ou **U** para RNA)
+
+    -   As letras dos nucleotídeos ambíguous
+
+## Completo Alfabeto IUPAC - DNA {.smaller}
+
+```{r}
+
+Biostrings::IUPAC_CODE_MAP
+```
+
+------------------------------------------------------------------------
+
+```{r iupac, echo = FALSE, fig.align='center', out.width = "60%"}
+
+knitr::include_graphics(here('images', 'iupac_dna_table.png'))
+
+```
+
+## Exemplo Simples - *gag* Gene do Vírus HIV
+
+```{r eg_gag}
+
+gag <- bioseq::read_fasta(here("gag_sequence.fasta"), type = "DNA")
+```
+
+-   Função `read_fasta()` precisa como argumentos:
+
+    -   Um arquivo fasta
+
+    -   Especificação do tipo do arquivo: DNA, RNA, ou Aminoácido
+
+## Retorna um Vetor do Tipo que Pedimos
+
+```{r gag1}
+
+gag
+class(gag)
+typeof(gag)
+
+```
+
+## Análises Básicas de *gag* {.smaller}
+
+-   Há vários atributos da sequência de *gag* que podemos estudar
+
+    -   Tamanho da sequência - quantos bases tem
+
+    -   Quantos de cada tipo de base a sequência tem (número e %)
+
+    -   Conteúdo G-C da sequência
+
+    -   Algumas desses precisam de um vetor das bases
+
+    -   Outras só o *string* de *gag*
+
+-   Utilizando funções de `bioseq` e de `stringr`
+
+    -   Lembrando que o `typeof()` de uma sequência é `character`
+
+## Contagem de Cada Base – 1 {.smaller}
+
+-   Usar a função `table()` de **base R**
+
+-   Precisa converter a sequência em um vetor das letras das bases
+
+    -   Agora, a sequência é um único elemento do objeto `gag`
+
+```{r}
+
+length(gag)
+```
+
+-   Criar uma função para fazer isso
+
+-   Primeiro, como vamos separar as bases em elementos do vetor?
+
+    -   Função `stringr::str_split_1()`
+
+    -   Argumentos: (1) a sequência (em aspas) e (2) caractere que vamos usar para o divisão
+
+        -   Neste caso, "" (2 aspas juntas)
+
+```{r str-split}
+
+str_split_1("ACTGGCC", "")
+```
+
+## Contagem de Cada Base – 2 {.smaller}
+
+-   Colocar esta função dentro de uma função que facilita a chamada
+
+-   Nome: `seq_table()` : retorna uma tabela da sequência
+
+-   Argumento: `s` : a sequência na formato de um string das bases
+
+```{r count_func}
+
+seq_table <- function(s) {
+  table(str_split_1(s, ""))
+}
+
+seq_table(gag)
+```
+
+## Outros Cálculos da Sequência
+
+-   Os outros vêm de `bioseq`
+
+-   Proporção das bases na sequência (`seq_stat_prop()`)
+
+-   Proporção da sequência que é G-C (`seq_stat_gc()`)
+
+-   Nomes das bases por extenso (`seq_spellout()`)
+
+    -   para sequências curtas - pode ser muito longo
+
+## Combinar Cálculos em uma Função
+
+-   Para facilitar uso desses funções, pode combinar em uma função
+
+-   Esta função vai tratar sequências sem caracteres ambigúous
+
+-   Vai só executar seq_spellout() se tem menos de 20 bases
+
+```{r func_calcs}
+
+stats_dna <- function(s){
+  print(seq_table(s))
+  print(seq_stat_prop(s))
+  if(nchar(s) <= 20) print(seq_spellout(s))
+}
+```
+
+## Aplicado a `gag`
+
+```{r func_to_gag}
+
+stats_dna(gag)
+```
+
+## Aplicado a "GCCTGTTAGAAACAG"
+
+-   Primeiros 15 bases de `gag`
+
+```{r func_to_short}
+
+stats_dna(dna("GCCTGTTAGAAACAG"))
+```
+
+## `seq_stat_prop()` Produz uma Lista
+
+```{r}
+class(seq_stat_prop(gag))
+typeof(seq_stat_prop(gag))
+```
+
+-   Primeira vez trabalhando com este tipo de objeto
+
+## Listas – Rapidinho {.smaller}
+
+-   Método de acesso um pouco diferente dos tibbles (não só "\$")
+
+-   Uso dos colchetes por cada nível das listas
+
+-   Lista Simples
+
+```{r lists1}
+
+l <- list(name = "Jim", age = 78, rating = "good guy")
+l
+```
+
+------------------------------------------------------------------------
+
+-   Agora, lista não tão simples
+
+-   Equivalente a um "diccionário" em Python
+
+```{r lists2}
+
+ll <- list(name = list("Jim", "Juan"), age = list(78, 26), rating = list("good guy", "average"))
+
+```
+
+-   **Live Coding** sobre como referir aos elementos desta lista
+
+## Melhorando o Resultado de `seq_stat_prop()` 
+
+-   A função sempre mostra todos as 15 bases possíveis. Muito extenso
+
+-   Suponha que queremos incluir somente as bases que tenham um valor \> 0
+
+-   Criar função
+
+## Primeiro Passo - Executar `seq_stat_prop()` 
+
+-   Atribuir resultado a uma variável (`char_list`)
+
+-   Sabemos que o resultado será uma lista
+
+```{r funcssp1}
+
+char_list <- seq_stat_prop(gag)
+class(char_list)
+```
+
+## Segundo Passo – Converter a Lista para Data Frame
+
+-   Lembre que tibbles e data frames são listas ao fundo
+
+-   Letras dos nomes das bases são nomes de fileira
+
+```{r funcssp2}
+
+char_df <- as.data.frame(char_list[[1]])
+head(char_df)
+```
+
+## Passo 3 – Limpar os Nomes das Variáveis
+
+```{r funcss3}
+char_df <- rownames_to_column(char_df, var = "base") # nomes para uma coluna
+names(char_df) <- c("base", "prop")
+head(char_df) 
+
+```
+
+## Passo 4 – Filtrando Valores Positivos
+
+```{r funcss4}
+
+filter(char_df, prop > 0)
+```
+
+## Combinar Passos em Uma Função
+
+-   `return()` os valores positivos
+
+-   Argumento: `seq`
+
+```{r funcss5}
+
+clean_seq_stat_prop <- function(seq) {
+  char_list <- seq_stat_prop(seq)
+  char_df <- as.data.frame(char_list[[1]])
+  char_df <- rownames_to_column(char_df, var = "base")
+  names(char_df) <- c("base", "prop")
+  return(filter(char_df, prop > 0))
+}
+```
+
+## Aplicar Função a `gag` e Outra
+
+```{r}
+
+clean_seq_stat_prop(gag)
+clean_seq_stat_prop(dna("GCCTGYTAR")) # test
+```
+
+## Tratando Bases Ambigúous
+
+-   Só A, C, G, T são as bases verdadeiros
+
+-   Outras letras são combinações possíveis de bases que o sequenciador determinou.
+
+```{r iupac2}
+
+Biostrings::IUPAC_CODE_MAP[5:15]
+
+```
+
+## Função de `bioseq` que Pode Ajudar com a Atribuição {.smaller}
+
+-   `bioseq::seq_disambiguate_IUPAC()` mostra todas as alternativas para substituir as bases ambigúos
+
+-   Aplicar ela para sequências teste
+
+```{r disambig}
+
+seq_a <- dna("GCCTGYTAR")
+
+seq_table(seq_a)
+clean_seq_stat_prop(seq_a)
+
+```
+
+## Aplicar `seq_disambiguate_IUPAC()`
+
+```{r disambig2}
+
+seq_a
+seq_disambiguate_IUPAC(seq_a)
+```
+
+# Agora, você deve tomar a decisão de qual nucleotídeo você quer {background-color="green"}
+
+# Transcrição e Tradução {background-color="blue"}
+
+-   Como tornar nucleotídeos em aminoácidos
+
+## Transcrição
+
+-   DNA -\> RNA
+
+-   Substituição de **U** (uracil) no lugar de **T** (thymine)
+
+-   Argumento: sequência de **DNA**
+
+-   Pode também fazer transcrição reversa com `seq_rev_transcribe()`
+
+    -   Argumento: Sequência de **RNA**
+
+```{r}
+
+gag_rna <- seq_transcribe(gag)
+seq_table(gag_rna)
+```
+
+## Tradução {.smaller}
+
+-   RNA -\> AA
+
+-   Argumento principal: sequência de **RNA**
+
+-   Mais 2 argumentos importantes
+
+    -   `code` – `int` que indica o código genético (fonte de código)
+
+        -   Padrão (1) é o código para toda célula for do mitocondrial
+
+    -   `codon_frame` – int que especifica a posição do nucleotídeo onde começar tradução
+
+        -   Mesma coisa como "*reading frame*" – valores de 1 até 6
+
+        -   Três para frente, três para trás
+
+        -   Padrão é `codon_frame = 1`
+
+## Tradução de `gag` {.smaller}
+
+-   Podemos comparar esta tradução aqui com a tradução feito com uma outra ferramenta do internet
+
+-   Vamos usar *reading frame* 1
+
+```{r}
+
+gag_test_aa <- seq_translate(gag, codon_frame = 1)
+gag_test_aa
+
+old_gag_aa <- read_fasta(here("gag protein RF1.fasta"), type = "AA")
+old_gag_aa
+
+seq_table(gag_test_aa)
+seq_table(old_gag_aa)
+```
+
+## Outras Operações Úteis 
+
+-   Inverso da sequência de DNA, RNA, ou AA
+
+    -   `seq_reverse()`
+
+-   Complemento da sequência de DNA ou RNA
+
+```{r inverse}
+seq <- dna("ACTTTGGCTAAG")
+seq
+seq_reverse(seq)
+seq_complement(seq)
+```
+
+# Agora BIOCONDUCTOR {background-color="blue"}
