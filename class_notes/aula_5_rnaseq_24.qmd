@@ -1,0 +1,857 @@
+---
+title: "Análise dos Dados com R"
+subtitle: "Bioconductor -- RNASeq"
+author: "James R. Hunter, PhD"
+institute: "Retrovirologia, EPM, UNIFESP"
+date: "2024-12-03"
+format:
+  revealjs:
+    theme: beige
+#    logo: epm_logo.png
+    slide-number: c/t
+editor: visual
+---
+
+```{r setup, include=FALSE}
+
+options(htmltools.dir.version = FALSE, scipen = 5)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+
+get_r_package_info <- function() {
+
+  r_package_table <- sessioninfo::package_info()
+  rownames(r_package_table) <- NULL
+
+  r_package_table <- r_package_table |>
+    tibble::as_tibble() |>
+    dplyr::mutate(
+      version = ifelse(is.na(r_package_table$loadedversion),
+                       r_package_table$ondiskversion,
+                       r_package_table$loadedversion)) |>
+    dplyr::filter(.data[["attached"]] == TRUE) |>
+    dplyr::select(
+      dplyr::any_of(c("package", "version",
+                      "date"))
+    )
+
+  return(r_package_table)
+}
+
+
+gr <- here::here("images")
+```
+
+# Nóticia Importante
+
+-   Aula de 10 de dezembro (semana que vem) vai ser trocado para 8 de janeiro
+
+-   Semana que vem Prof. Fernando Antonelli vai dar a 1ª aula dele
+
+## Introdução
+
+-   Análise de dados da sequência de alto rendimento ("high-throughput sequence data")
+
+-   Investigar vários aspectos de genes e transcripts
+
+-   Hoje, olhar na expressão diferencial dos genes
+
+-   O processo vai definir um dos muitos **fluxos de trabalho** possíveis de análise bioinformática
+
+## Pacotes para Instalar para a Aula
+
+```{r install_bioc, eval = FALSE}
+
+BiocManager::install(c("airway", "tximeta"))
+
+```
+
+-   Instalação desses 2 pacotes vai causar instalação de vários outros necessários para funcionamento
+
+## Dados – Airway
+
+-   Um experimento RNA-seq que tratou células musculares lisas das vias aéreas com dexametasona
+
+-   4 linhas de células
+
+    -   Cada linha tem uma amostra tratada e outra não-tratada
+
+-   Dexametasona - glicocorticoide sintético esteroide com efeitos anti-inflamatórios
+
+-   Utilizado no tratamento de doenças respiratórias entre outras coisas
+
+-   Dados resumidos no pacote `airway`
+
+## Carregar Pacotes
+
+```{r}
+
+library(airway)
+library(tximeta)
+```
+
+## Os Pacotes Carregados {.smaller}
+
+```{r bioc_packages, echo = FALSE}
+
+get_r_package_info() |> 
+  gt::gt() |> 
+  gt::tab_header(
+    title = "Tximeta & Airway Related Packages"
+  )
+```
+
+-   Pedir 2, pega 11
+
+## Passo 1 do Fluxo – Quantificação
+
+-   Quantificação de expressão dos transcripts
+
+-   Contagem feito fora de Bioconductor
+
+-   Muitos softwares fazem isso
+
+-   Este estudo utilizou **Salmon**
+
+    -   <https://combine-lab.github.io/salmon/>
+
+-   `airway` contem os arquivos saindo da operação de Salmon
+
+## Arquivos de `airway`  {.smaller}
+
+```{r arquivos_airway}
+
+dir <- system.file("extdata", package="airway", mustWork=TRUE)
+list.files(dir) 
+
+```
+
+-   8 arquivos BAM
+
+-   1 de referência
+
+-   2 de contagem (na sub-pasta `quants`)
+
+## Arquivos com Contagem
+
+```{r arquivos_contagem}
+
+(ff <- list.files(file.path(dir, "quants")))
+```
+
+## BAM File
+
+-   *Binary Alignment Map*
+
+-   Os dados brutos abrangentes do sequênciamento genómico
+
+-   Forma binária de um arquivo SAM (*Sequence Alignment Map*)
+
+## Tabela das Amostras
+
+-   Próximo passo é criar um arquivo csv com Excel que liga as amostras para os arquivos associados FASTQ e Salmon.
+
+-   Aqui já tem (`sample_table.csv`)
+
+```{r samp_table_echo, echo = TRUE, eval = FALSE}
+
+csvfile <- file.path(dir, "sample_table.csv")
+coldata <- read_csv(csvfile)
+coldata[, 1:5]
+coldata[, c(1, 6:10)]
+```
+
+------------------------------------------------------------------------
+
+```{r samp_table_eval, echo = FALSE, eval = TRUE}
+
+csvfile <- file.path(dir, "sample_table.csv")
+coldata <- readr::read_csv(csvfile)
+coldata[, 1:5]
+coldata[, c(1, 6:10)]
+
+```
+
+## Trabalhar com Salmon Quant Data
+
+-   Só as primeiras duas amostras são os dados de Salmon.
+
+    -   Vamos trabalhar com eles
+
+-   Dá colunas nomes de `names` e `files`
+
+```{r salmon_work}
+
+coldata12 <- coldata[1:2,]
+coldata12$names <- coldata12$Run
+coldata12$files <- file.path(dir, "quants", coldata12$names, "quant.sf.gz")
+file.exists(coldata12$files)
+coldata12$files
+```
+
+## Importar os Dados para Preparar Eles {.smaller}
+
+-   `tximeta` importa metadata e anotações durante a importação das quantificações dos transcripts
+
+-   Importa dados ao nível dos transcripts
+
+-   tximeta() localiza e faz o download das informações dos fontes vários do internet.
+
+-   O resultado do trabalho é um objeto da classe `SummarizedExperiment` (`se`)
+
+> Tximeta performs numerous annotation and metadata gathering tasks on behalf of users during the import of transcript quantifications from *Salmon*, *alevin*, or *piscem-infer* into R/Bioconductor. Metadata and transcript ranges are added automatically, facilitating genomic analyses and assisting in computational reproducibility.
+
+```{r import_txmeta, message = FALSE}
+
+se <- tximeta(coldata12)
+
+```
+
+## tximeta Retorna a Seguinte Informação {.smaller}
+
+```{r txim_out, echo = FALSE, fig.align='center', out.width = "90%"}
+library(here)
+knitr::include_graphics(here('images', 'tximeta_output.png'))
+
+```
+
+## Tamanho do Conjunto dos Dados
+
+```{r size}
+
+dim(se)
+head(rownames(se)) # 1a 6 fileiras
+
+```
+
+-   Total de 110.4 MB na memoria
+
+-   205870 Transcripts
+
+-   Precisa fazer um resumo das quantificações (que são ao nível do transcript) ao nível dos genes.
+
+    -   Objetivo: Analisar os genes
+
+-   Função `summarizetoGene()` faz a conversão para o nível do gene
+
+# SummarizedExperiment {background-color="blue"}
+
+-   Classe geral que facilita a transferência dos dados entre pacotes
+
+## `SummarizedExperiment` – 3 Blocos de Informação
+
+```{r se_strut, echo = FALSE, fig.align='center', out.width = "90%"}
+
+knitr::include_graphics(here('images', 'se_blocks.png'))
+
+```
+
+## 3 Blocos
+
+-   rowRanges: info re: os intervalos genômicos
+
+-   colData: info re: as amostras
+
+-   *"assays"/counts* matriz da contagem
+
+    -   Os dados que vamos usar para a análise
+
+## Converter ao Um `SummarizedExperiment` dos Genes {.smaller}
+
+```{r makegse}
+
+gse <- summarizeToGene(se)
+
+```
+
+```{r gse_strut, echo = FALSE, fig.align='center', out.width = "90%"}
+
+knitr::include_graphics(here('images', 'gse_result.png'))
+
+```
+
+## Verificar Tamanho dos Genes
+
+```{r tam_genes}
+
+dim(gse)
+head(rownames(gse))
+```
+
+-   58,294 genes invés de 205,870 transcripts e só 53 MB
+
+# Pronto para dESeq2 {background-color="blue"}
+
+-   Verdadeira análise
+
+-   O fluxo de trabalho que usamos é só um. Existem vários
+
+## Versão Final de `gse`
+
+-   Vamos usar um outra versão de `gse` que vem do pacote (agora com 38MB)
+
+```{r new_gse}
+
+data(gse) #por na memoria do pacote
+gse
+```
+
+## Olhar na Matriz `counts`
+
+```{r matriz_counts}
+
+assayNames(gse)
+head(assay(gse), 3) # só 3 fileiras
+```
+
+-   Os elementos dos dados que são o objetivo do estudo
+
+## Totais das Colunas
+
+-   Através de todas as amostras
+
+-   Nova função `colSums()`
+
+    -   Faz total de todos os elementos de todos os colunas
+
+```{r sum_cols}
+
+colSums(assay(gse))
+
+```
+
+## rowRanges
+
+-   Informação sobre os genes (fileiras)
+
+-   No formato de GRanges
+
+    -   Classe para organizar genes ou transcripts mostrando os dados
+
+        -   Extenso do gene (Start - Stop)
+
+        -   Metadata
+
+        -   Sequências (cromossomos)
+
+-   Comando mostra os dados sobre os primeiro 5 e último 5 ranges
+
+------------------------------------------------------------------------
+
+```{r show_rows}
+
+rowRanges(gse)
+```
+
+## Informação sobre as Sequências {.smaller}
+
+```{r chromo}
+
+seqinfo(rowRanges(gse))
+```
+
+## colData – Info re: Amostras
+
+```{r cols_info}
+
+colData(gse)
+
+```
+
+# DESeq2 – Nossa Ferramenta
+
+-   Entre muitas outras
+
+## Cria uma classe `DESeqDataSet` 
+
+-   Construído acima de um `SummarizedExperiment`
+
+-   Agora, o slot `assay` será acessado por `counts`
+
+-   Tem uma formula de design associado
+
+-   Podemos acessar os dados das colunas com `$`
+
+    -   Aplica igualmente a `SummarizedExperiment` e `DESeqDataSet`
+
+    -   Mesmo anotação que os data frames
+
+## Pode Ver a Hierarquia dos Slots com `View()`
+
+```{r gse_dollar, echo = FALSE, fig.align='center', out.width = "90%"}
+
+knitr::include_graphics(here('images', 'gse_str_view.png'))
+
+```
+
+## Algumas Colunas de `gse` 
+
+```{r gse_cols}
+gse$donor
+gse$condition
+```
+
+> Qual tipo de dado são `donor` e `condition`?
+
+## Pode Manipular as Variáveis {.smaller}
+
+-   `donor` não faz muito sentido em nosso contexto: trocar para `cell`
+
+-   Trocar `dex` no lugar de `condition`
+
+```{r gse_vars}
+
+gse$cell <- gse$donor
+gse$dex <- gse$condition
+
+# resultado
+gse@colData@listData
+```
+
+## Podemos Tirar as 2 Variáveis que não Prestam Mais {.smaller}
+
+```{r gse_tirar_vars}
+
+gse$condition <- NULL
+gse$donor <- NULL
+
+# resultado
+gse@colData@listData
+```
+
+## Pode Manipular os Níveis
+
+-   Função (base R) levels() relata os níveis dos fatores
+
+    -   Tb, pode receber novos valores
+
+-   VSS - a ordem dos níveis devem ser preservada
+
+-   Para `dex`
+
+    -   Trocar "Untreated" para "untrt"
+
+    -   Trocar "Dexamethasone" para "trt"
+
+```{r mud_levels}
+
+levels(gse$dex)
+levels(gse$dex) <- c("untrt", "trt")
+levels(gse$dex)
+```
+
+## Design Formula {.smaller}
+
+-   Este elemento usamos para contar para DESeq2 o que queremos testar
+
+-   É o tipo de anotação que usamos em muitas funções
+
+    -   E.g., `lm()`, a função que usamos para fazer regressão linear
+
+-   Queremos saber para quais genes o efeito de tratamento é diferente
+
+-   Normalmente tem formato de: `~ group + treatment`
+
+    -   Pode incluir um termo de interação, se for desejado
+
+    -   `~ group + treatment + group:treatment`
+
+    -   Não em nosso caso
+
+## Lembre o Tamanho dos Dados
+
+-   Salmon mapeou milhões de fragmentos genômicos
+
+    -   Abaixo, expresso em milhões de fragmentos
+
+```{r num_frags}
+
+round( colSums(assay(gse)) / 1e6, 1 )
+```
+
+## Carregar DESeq2
+
+-   Chamar a função `DESeqDataSet()` para preparar as operações de algoritmo
+
+-   Usando o design formula
+
+-   Produz um "`Large DESeqDataSet (58294 elements, 36.1 MB)`"
+
+```{r load_des}
+
+library(DESeq2)
+dds <- DESeqDataSet(gse, design = ~ cell + dex)
+```
+
+# Exploração de `dds` {background-color="blue"}
+
+-   Antes de fazer a análise vamos explorar um pouco nossos dados
+
+-   Especialmente as contagens
+
+## Só Queremos Genes que Dá Informação
+
+-   Filtrar as fileiras dos `counts` que têm suficiente fragmentos para informar nossa análise
+
+    -   Muitas genes vão ter um número tão pequeno de fragmentos que são inúteis para a análise
+
+-   Vamos olhar um pouco na estrutura de counts
+
+## Estrutura de `counts` {.smaller}
+
+```{r counts_str}
+
+str(counts(dds))
+
+# olhar no head de counts
+counts(dds)[1:6, 1:8]
+```
+
+## Proposta {.smaller}
+
+-   Pelo menos, 4 células de cada gene (fileira) deve ter ao menos 10 fragmentos
+
+    -   fragmentos = count da célula
+
+    -   4 células porque temos 4 grupos que estamos avaliando
+
+        -   4 linhas de células diferentes
+
+-   `rowSums()` calcula o total dos valores dentro de uma fileira, para todas as fileiras.
+
+-   Queremos ter então pelo menos metade das colunas (4 de 8) com uma contagem \>= 10
+
+-   Vai fazer o processamento mais rápido e reduzir o tamanho do DESeqDataSet
+
+## Para Chegar Lá . . . 
+
+-   Quantas fileiras têm uma contagem de 0
+
+    -   Nenhuma amostra teve fragmento sobreposto do gene
+
+```{r}
+zeros <- rowSums(counts(dds)) == 0
+ddsz <- dds[zeros, ]
+dim(ddsz)
+
+moreten <- rowSums(counts(dds)) >= 10
+ddsmt <- dds[moreten, ]
+dim(ddsmt)
+```
+
+```{r clean_memory, echo = FALSE}
+rm(ddsmt, ddsz, moreten, zeros, se)
+```
+
+## Para Completar o Cálculo {.smaller}
+
+-   Vamos ver quantos de `ddsmt` tem pelo menos 4 amostras com esta contagem
+
+```{r}
+
+keep <- (rowSums(counts(dds) >= 10)) >= 4
+# parênteses em torno do 1º teste para facilitar a leitura
+dds_fin <- dds[keep, ]
+# tamanho
+dim(dds_fin)
+# mostrar cabeça de novo
+counts(dds_fin)[1:6, 1:8]
+dim(dds_fin)
+```
+
+## Conclusões deste Passo
+
+1.  Agora chegamos com 16.637 genes que têm informação útil
+
+<!-- -->
+
+2.  Velho ENSG00000000005.5 não é mais na 2ª fileira – contagem 0
+
+## Fluxo para Expressão Diferencial
+
+-   Especificamos um desenho experimental na *design formula*
+
+    -   Quando criamos o `DESeqDataSet` : "`DESeqDataSet(gse, design = ~ cell + dex)` "
+
+-   Utilizando as contagens brutas que já temos, podemos chamar a função `DESeq`
+
+-   Retorna um novo DESeqDataSet com todos os parâmetros da análise
+
+```{r func_deseq}
+
+dds_out <- DESeq(dds_fin)
+```
+
+## Conteúdo dos Resultados – `dds_fin` {.smaller}
+
+-   Objetivo da função: calcular a expressão diferencial de tratamento ou não-tratamento dos genes
+
+-   Produz um serie de resultados num data frame
+
+-   A expressão diferencial está diretamente visto na coluna "`log2FoldChange`" que está uma transformação das contagens
+
+    -   Controla para diferenças em na profundidade do sequenciamento das amostras e a disperção do cada gene
+
+-   Aplica um modelo linear geral com a distribuição "*Negative Binomial*"
+
+-   Indicações estatísticas sobre a diferencial para cada gene
+
+## Tabela dos Resultados {.smaller}
+
+```{r tabres}
+
+(res <- results(dds_out))
+```
+
+-   Quer saber o querem dizer essas colunas?
+
+## Metadata na `res`
+
+-   Função do pacote `S4Vectors`
+
+-   Especificamente acessar as colunas com metadata
+
+```{r metares}
+
+mcols(res, use.names = TRUE)
+```
+
+## `log2FoldChange` 
+
+-   Estimativa de tamanho de efeito (*effect size*)
+
+-   Relata quanto a expressão do gene mudou por causa do tratamento com dexametasona
+
+-   Escala logaritmica relativa a base 2
+
+$$log2FoldChange = 1.5 = 2^{1.5}\approx2.828 $$
+
+-   `lfcSE` – erro padrão de *fold change*
+
+-   Outros – estatísticas
+
+## Resumo dos Resultados {.smaller}
+
+-   A função generica `summary()` tem método especial aqui para classe `DESeqResults`
+
+-   Pode ajustar o valor-p com o argumento `alpha =` e um valor (e.g. 0.05)
+
+-   Temos aqui `r 2362+2019` genes mostrando diferencial dos 16637 genes
+
+```{r resum}
+
+summary(res)
+```
+
+## Mudança para $\alpha$ de 0.05
+
+```{r alpha05}
+
+res05 <- results(dds_out, alpha = 0.05)
+table(res05$padj < 0.05)
+```
+
+-   Redução do número de genes que mostram a diferencial significativa
+
+# Gráficos dos Resultados {background-color="blue"}
+
+-   Uma amostra das possibilidades gráficas
+
+## Gráfico das Contagens Brutas
+
+-   Queremos saber com o gene mais significativa mudou por causa de tratamento
+
+-   Vamos indentificar o gene mais significativa, i.e., o gene com o valor mínimo de `padj`
+
+-   Mostrar as contagens brutas relacionados a ele
+
+```{r topcount}
+
+(topgene <- rownames(res)[which.min(res$padj)])
+```
+
+## Construir Gráfico {.smaller}
+
+-   Precisa `DESeq2::plotCounts()` – função que prepara contagens para gráficos fazendo
+
+    -   Normalização
+
+    -   Mais um *pseudocontagem* de 0.5 para evitar logs de 0
+
+```{r count_plot}
+
+library(ggplot2)
+geneCounts <- plotCounts(dds_out, gene = topgene, intgroup = c("dex", "cell"),
+                         returnData = TRUE)
+head(geneCounts)
+```
+
+## O Gráfico
+
+```{r top_graf}
+
+ggplot(geneCounts, aes(x = dex, y = count, color = cell)) +
+  scale_y_log10() + 
+  geom_point(size = 3) +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+### Para Fazer Mais Claro, Acrescentar Linhas
+
+```{r graf_linha}
+
+ggplot(geneCounts, aes(x = dex, y = count, color = cell, group = cell)) +
+  scale_y_log10() + 
+  geom_point() +
+  geom_line() +
+  scale_colour_manual(values = c("#800000FF", "#767676FF", "#155F83FF", "#8A9045FF")) +
+  theme_bw()
+```
+
+## Gráfico MA
+
+-   MA - "*mean average*" – log2 fold changes (no eixo y) x a média das contagens normalizada
+
+-   Mostra quanto variância tem no modelo
+
+-   Cores padronizados:
+
+    -   Azul - genes com fold change significativa
+
+    -   Cinza - genes com fold change não - significativa
+
+-   Também chamado gráfico Bland-Altman
+
+## Passo Anterior {.smaller}
+
+-   Precisa restritar ("*shrink*") os valores dos log2 fold changes para comparison das amostras tratadas contra as amostras não tratadas
+
+-   Função `lfcShrink()` usa um dos 3 algoritmos para fazer esta restrição
+
+-   Nós vamos usar o algoritmo `apeglm`, que fica no pacote `apeglm`
+
+-   Aplicar este algoritmo para a comparação que nos interesse – `dex_trt_vs_untrt`
+
+-   Achamos este nome no resultado da função resultsNames()
+
+```{r shrink}
+
+library(apeglm)
+resultsNames(dds_out)
+```
+
+## lfcShrink e Gráfico  {.smaller}
+
+-   Agoritmo de shrink utiliza uma procedimento Bayesiano para suavizar contagens muito baixas ou com uma variância alta.
+
+-   Gráfico mostra que como os normalized counts aumentam os genes com fold change insignificativa diminuem
+
+```{r shrink2}
+
+res_shrink <- lfcShrink(dds_out, coef="dex_trt_vs_untrt", type="apeglm")
+plotMA(res, ylim = c(-5, 5))
+```
+
+# O Que Fazer com Esses Resultados
+
+## Relatórios e Anotacões
+
+-   Até agora, nossos resultados são muitos abstratos
+
+-   Não tem como descrever eles em termos biológicos ainda
+
+-   O processo de anotação torna esses tabelas dos genes ser mais compreensíveis
+
+::: callout-note
+Os nomes dos genes que temos agora são ids dos genes `Ensembl` : e.g. ENSG00000285953.1
+:::
+
+## Anotacação em Bioconductor {.smaller}
+
+-   Pacote `AnnotationDbi` – relaciona os nomes que já temos para nomes e atributos em uso comum
+
+-   Nosso tecido vem de seres humanos
+
+-   O pacote que lista os atributos dos genes humanos: `org.Hs.eg.db`
+
+    -   organismo/Homo Sapiens/Entrez Gene IDs/base de dados
+
+-   Mas, esses têm bastante informação
+
+```{r anote1}
+
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+columns(org.Hs.eg.db)
+```
+
+## Chave para Criar Novas Colunas de Dados: `mapIds()`
+
+-   `mapIDs()` entre na base de dados da espécie (`org.Hs.eg.db`) e deixa você tira as informações que quiser
+
+-   Cada chamada para a função pode criar uma nova coluna em nossos resultados
+
+-   Porque os IDs de nossos genes são do tipo ENSEMBL, esse deve ser nosso `keytype = "ENSEMBL"`
+
+## Criar 2 novas colunas
+
+1.  `symbol` – ID que é mais comum invés de ENSEMBL
+
+2.  `entrez` – ID do sistema ENTREZ
+
+::: callout-note
+## ENTREZ
+
+Sistema de NCBI dos NIH que alberga informações sobre os nucleotídeos, proteinas, genes, e mais
+:::
+
+## Programação de `mapIDs()` {.smaller}
+
+-   Limitar para primeiros 15 genes em nossos resultados
+
+-   Precisa todos os argumentos
+
+```{r mapid1}
+
+# 1o 15 resultados
+first_fifteen <- substr(rownames(res), 1, 15)
+# symbol
+res$symbol <-  mapIds(org.Hs.eg.db,
+                      keys = first_fifteen,
+                      column = "SYMBOL",
+                      keytype = "ENSEMBL",
+                      multiVals = "first") #se tiver valores múltiplas
+res$entrez <- mapIds(org.Hs.eg.db,
+              keys = first_fifteen,
+              column = "ENTREZID",
+              keytype = "ENSEMBL",
+              multiVals = "first")
+```
+
+## Ver os Novos Dados dos Resultados – em `str()`
+
+```{r mapid2, echo = FALSE, fig.align='center', out.width = "90%"}
+
+knitr::include_graphics(here('images', 'symbolentrez.png'))
+```
+
+## Novos Resultados  {.smaller}
+
+-   Foco nos 6 mais importantes genes
+
+```{r novosres}
+
+resOrdered <- res[order(res$padj), c(1:2, 6:8)]
+head(resOrdered, 6)
+```
+
+# Só Uma Introdução a RNASeq e Expressão Genômica {background-color="blue"}
